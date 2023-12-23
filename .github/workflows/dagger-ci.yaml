@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install deps
-        run: pip install anyio
+        run: pip install anyio dagger-io
       - name: Install Dagger CLI
         run: cd /usr/local && { curl -L https://dl.dagger.io/dagger/install.sh | sh; cd -; }
       - name: Run Dagger pipeline
