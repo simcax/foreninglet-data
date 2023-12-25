@@ -177,3 +177,30 @@ def __activity_data(self):
 def activity_data():
     """Mock the activitylist data"""
     return __activity_data()
+
+
+@pytest.fixture
+def mocked_memberlist():
+    """
+    Fixture for creating fake memberlist data
+    """
+
+    def _mocked_memberlist(membercount: int):
+        """Returns a mocked / fake memberlist"""
+        # Generate a memberlist of mocked members
+        memberlist = ""
+        memberlist_comma = ""
+        for i in range(1, membercount):
+            if memberlist != "" and i == 10:
+                memberlist_comma = ","
+            else:
+                memberlist_comma = ""
+
+            member = MockMember().mock_member()
+            memberlist += member + memberlist_comma
+
+        memberlist.strip("'")
+        memberlist = f"[{memberlist}]"
+        return memberlist
+
+    return _mocked_memberlist

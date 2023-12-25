@@ -1,7 +1,11 @@
+import json
+
 import pytest
 
 import foreninglet_data
 from foreninglet_data import api
+
+from .mock_member import MockMember
 
 
 @pytest.mark.xfail
@@ -38,9 +42,10 @@ def test_get_memberlist():
     assert isinstance(memberlist, str)
 
 
-@pytest.mark.vcr()
-def test_get_gender_count():
+def test_get_mocked_memberlist(mocked_memberlist):
     """
     Test getting the count of each gender
     """
-    fl_cls = api.ForeningLet()
+    memberlist = json.loads(mocked_memberlist(10))
+    assert isinstance(memberlist, dict)
+    assert len(memberlist) == 10
