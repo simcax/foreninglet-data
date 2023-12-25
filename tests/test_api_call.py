@@ -44,7 +44,7 @@ def test_get_memberlist():
 
 def test_get_mocked_memberlist(mocked_memberlist):
     """
-    Test getting the count of each gender
+    Test getting a mocked memberlist
     """
     memberlist = json.loads(mocked_memberlist(10))
     assert isinstance(memberlist, dict)
