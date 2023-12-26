@@ -47,8 +47,12 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     females = 0
     if groups.get("M", "") != "":
         males = groups["M"]
+    if groups.get("Mand", "") != "":
+        males += groups["Mand"]
     if groups.get("K", "") != "":
         females = groups["K"]
+    if groups.get("Kvinde", "") != "":
+        females += groups["Kvinde"]
     memberlist_obj = Memberlist(memberlist)
     assert memberlist_obj.count_men == males
     assert memberlist_obj.count_women == females
