@@ -8,11 +8,11 @@ import pandas as pd
 from foreninglet_data.memberlist import Memberlist
 
 
-def test_memberlist_isobject():
+def test_memberlist_isobject(mocked_memberlist):
     """
     A test to see a memberlist object has the correct membercount attribute
     """
-    memberlist_obj = Memberlist()
+    memberlist_obj = Memberlist(mocked_memberlist(2))
     assert isinstance(memberlist_obj, object)
 
 
