@@ -5,6 +5,7 @@ import json
 
 import pandas as pd
 
+from foreninglet_data.api import ForeningLet
 from foreninglet_data.memberlist import Memberlist
 
 
@@ -51,3 +52,14 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     memberlist_obj = Memberlist(memberlist)
     assert memberlist_obj.count_men == males
     assert memberlist_obj.count_women == females
+
+
+def test_memberlist_class_works_with_real_api_data():
+    """
+    Tests the memberlist class works with memberlist data
+    coming from the ForeningLet API
+    """
+    fl_obj = ForeningLet()
+    memberlist = fl_obj.get_memberlist()
+    memberlist_obj = Memberlist(memberlist)
+    assert isinstance(memberlist_obj.member_count, int)
