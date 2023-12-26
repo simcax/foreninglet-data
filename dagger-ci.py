@@ -24,8 +24,6 @@ async def test():
             .with_directory("/src", src)
             # set current working directory for next commands
             .with_workdir("/src")
-            # Create empty .env file
-            .with_new_file(".env")
             # Install main test tools
             .with_exec(["python", "-m", "pip", "install", "poetry", "black", "pylint"])
             # Check standards
@@ -33,7 +31,9 @@ async def test():
             # install test dependencies
             .with_exec(["poetry", "install", "--with", "dev"])
             # run tests
-            .with_exec(["poetry", "run", "pytest", "--vcr-record=none", "."])
+            .with_exec(
+                ["poetry", "run", "python", "-m", "pytest", "--vcr-record=none", "."]
+            )
         )
 
         # execute

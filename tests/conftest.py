@@ -57,7 +57,7 @@ def __mock_memberlist(self):
     return mocked_members
 
 
-def __activity_data(self):
+def __activity_data():
     activitydata = [
         {
             "ActivityId": "12345",
