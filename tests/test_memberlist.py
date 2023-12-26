@@ -39,10 +39,15 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     Tests the memberlist object to initialize the count of members for each gender
     as attributes
     """
-    memberlist = mocked_memberlist(11)
+    memberlist = mocked_memberlist(12)
     df = pd.read_json(json.dumps(memberlist))
-    males = df["Gender"].value_counts()["M"]
-    females = df["Gender"].value_counts()["K"]
+    groups = df.groupby("Gender").size()
+    males = 0
+    females = 0
+    if groups.get("M", "") != "":
+        males = groups["M"]
+    if groups.get("K", "") != "":
+        females = groups["K"]
     memberlist_obj = Memberlist(memberlist)
     assert memberlist_obj.count_men == males
     assert memberlist_obj.count_women == females

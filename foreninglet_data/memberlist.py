@@ -33,5 +33,12 @@ class Memberlist:
         if isinstance(the_memberlist, list):
             the_memberlist = json.dumps(self.memberlist)
         df = pd.read_json(the_memberlist)
-        self.count_men = df["Gender"].value_counts()["M"]
-        self.count_women = df["Gender"].value_counts()["K"]
+        groups = df.groupby("Gender").size()
+        men = 0
+        women = 0
+        if groups.get("M", "") != "":
+            men = groups["M"]
+        if groups.get("K", "") != "":
+            women = groups["K"]
+        self.count_men = men
+        self.count_women = women
