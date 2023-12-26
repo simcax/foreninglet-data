@@ -1,4 +1,5 @@
 """Test configuration for the ForeningLet Data module"""
+import json
 import sys
 from random import randint
 from unittest.mock import Mock
@@ -189,9 +190,9 @@ def mocked_memberlist():
         """Returns a mocked / fake memberlist"""
         # Generate a memberlist of mocked members
         memberlist = ""
-        memberlist_comma = ""
-        for i in range(1, membercount):
-            if memberlist != "" and i == 10:
+        memberlist_comma = ","
+        for i in range(1, membercount + 1):
+            if i != membercount:
                 memberlist_comma = ","
             else:
                 memberlist_comma = ""
@@ -201,6 +202,6 @@ def mocked_memberlist():
 
         memberlist.strip("'")
         memberlist = f"[{memberlist}]"
-        return memberlist
+        return json.loads(memberlist)
 
     return _mocked_memberlist
