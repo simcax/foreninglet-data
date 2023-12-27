@@ -10,6 +10,8 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
+      - name: Build release
+        run: poetry build
       - name: Archive release
         uses: actions/upload-artifact@v3
         with:
