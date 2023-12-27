@@ -1,0 +1,21 @@
+name: build-release
+on: 
+  pull_request:
+    branches: [release]
+    types:
+      - opened
+
+jobs:
+  build-release:
+    name: build-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install poetry
+      - name: Build release
+        run: poetry build
+      
