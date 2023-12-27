@@ -1,6 +1,6 @@
 name: release
 on: 
-  merge:
+  pull_request:
     branches: [release]
 
 jobs:
