@@ -1,18 +1,17 @@
 name: release
-on: 
+on:
   pull_request:
     branches: [release]
+    types:
+      - closed
 
 jobs:
-  build-release:
-    name: build-release
+  if_merged:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Archive release
+        uses: actions/upload-artifact@v3
         with:
-          python-version: '3.11'
-      - name: Install deps
-        run: pip install poetry
-      - name: Build release
-        run: poetry build
+          name: release
+          path: dist/foreninglet_data-*-py3-none-any.whl
