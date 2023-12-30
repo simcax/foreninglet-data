@@ -23,3 +23,5 @@ jobs:
         with:
           name: release
           path: dist/*.whl
+      - name: Publish on PyPi
+        run: poetry publish
