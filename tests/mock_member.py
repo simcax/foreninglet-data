@@ -1,5 +1,6 @@
 """Enables mocking of a member as returned from the ForeningLet API"""
 
+import random
 from random import randint
 
 from faker import Faker
@@ -45,7 +46,7 @@ class MockMember(Member):
             DeliveryMethod=self.delivery_methods[randint(0, 2)],
             Created=fake.date_of_birth(minimum_age=1).strftime("%Y-%m-%d"),
             Updated=fake.date_of_birth(minimum_age=1).strftime("%Y-%m-%d"),
-            GenuineMember=1,
+            GenuineMember=random.choice([0, 1]),
             activity_ids={"12345"},
         )
         if output_type == "json":

@@ -69,4 +69,16 @@ def test_memberlist_class_works_with_real_api_data():
     memberlist = fl_obj.get_memberlist()
     memberlist_obj = Memberlist(memberlist)
     assert isinstance(memberlist_obj.member_count, int)
-    assert isinstance(memberlist_obj.member_count, int)
+
+
+def test_memberlist_only_genuine_members(mocked_memberlist):
+    """
+    Test to only get members where genuinemember == 1
+    """
+    memberlist = mocked_memberlist(20)
+    memberlist_obj = Memberlist(memberlist)
+
+    gen_member_count = 0
+    for member in memberlist:
+        gen_member_count += member["GenuineMember"]
+    assert memberlist_obj.genuine_member_count == gen_member_count

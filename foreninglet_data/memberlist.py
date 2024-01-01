@@ -14,6 +14,7 @@ class Memberlist:
     """
 
     memberlist = ""
+    genuine_member_count = 0
     member_count = 0
     count_men = 0
     count_women = 0
@@ -23,6 +24,7 @@ class Memberlist:
         self.memberlist = memberlist
         self._load_memberlist_to_dataframe()
         self._count_members()
+        self._count_genuine_members()
         self._count_genders()
 
     def _count_members(self):
@@ -31,6 +33,13 @@ class Memberlist:
         """
         df = self.memberlist_dataframe
         self.member_count = len(df)
+
+    def _count_genuine_members(self):
+        """
+        Method to get the count of genuine members
+        """
+        df = self.memberlist_dataframe
+        self.genuine_member_count = len(df.loc[df["GenuineMember"] == 1])
 
     def _count_genders(self):
         """
