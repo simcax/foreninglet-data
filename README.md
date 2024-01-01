@@ -45,7 +45,10 @@ memberlist_obj = Memberlist(memberlist)
 Retrieve the membercount:
 
 ```python
+# All members
 memberlist.member_count
+# All the GenuineMembers
+memberlist.genuine_member_count
 ```
 
 Retrieve the count of genders:
