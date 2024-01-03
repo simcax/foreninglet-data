@@ -199,7 +199,6 @@ def mocked_memberlist():
 
             member = MockMember().mock_member()
             memberlist += member + memberlist_comma
-
         memberlist.strip("'")
         memberlist = f"[{memberlist}]"
         return json.loads(memberlist)

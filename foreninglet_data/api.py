@@ -59,7 +59,7 @@ class ForeningLet:
     def get_memberlist(self):
         """Retrieves members from the member API endpoint"""
         resp = self.fl_api_get(self.api_members_url)
-        return resp.text
+        return json.loads(resp.text)
 
     @vcr.use_cassette("tests/fl_api_get_activities")
     def get_activites(self):

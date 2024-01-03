@@ -69,4 +69,43 @@ def test_memberlist_class_works_with_real_api_data():
     memberlist = fl_obj.get_memberlist()
     memberlist_obj = Memberlist(memberlist)
     assert isinstance(memberlist_obj.member_count, int)
-    assert isinstance(memberlist_obj.member_count, int)
+
+
+def test_memberlist_only_genuine_members(mocked_memberlist):
+    """
+    Test to only get members where genuinemember == 1
+    """
+    memberlist = mocked_memberlist(20)
+    memberlist_obj = Memberlist(memberlist)
+
+    gen_member_count = 0
+    for member in memberlist:
+        gen_member_count += member["GenuineMember"]
+    assert memberlist_obj.genuine_member_count == gen_member_count
+
+
+def test_memberlist_age_counts_totals_returns_dict(mocked_memberlist):
+    """
+    Test to retrieve the number of members for each age group
+    """
+    memberlist = mocked_memberlist(20)
+    memberlist_obj = Memberlist(memberlist)
+    age_counts = memberlist_obj.members_age_list
+    assert isinstance(age_counts, dict)
+
+
+def test_memberlist_age_counts_totals_returns_dict_matching_genuine_membercount(
+    mocked_memberlist,
+):
+    """
+    Test to retrieve the number of members for each age group
+    """
+    this_memberlist = mocked_memberlist(20)
+    my_memberlist_obj = Memberlist(this_memberlist)
+    age_counts = my_memberlist_obj.members_age_list
+    print(f"Age count count:{len(age_counts)}")
+    member_counts_total = 0
+    for member_count in age_counts.values():
+        member_counts_total += member_count
+        print(f"Member count: {member_count} ")
+    assert member_counts_total == 20
