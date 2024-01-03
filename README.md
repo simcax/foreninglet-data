@@ -58,3 +58,17 @@ memberlist.count_men
 memberlist.count_women
 ```
 
+Getting a list of member ages 
+```python
+memberlist.member_age_list
+```
+This is a dict with a full range of each age from the youngest to the eldest member. 
+In the case no members are of a given age, the dict will contain the age but a count of 0.
+
+The dict is sorted by age.
+
+i.e:
+```python
+{23: 1, 24: 0, 25: 0, 26: 0, 27: 0, 28: 0, 29: 0, 30: 1, 31: 0, 32: 0, 33: 0, 34: 0, 35: 0, 36: 0, ...}
+```
+
