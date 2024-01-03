@@ -39,7 +39,7 @@ def test_get_memberlist():
     """Test the list of members being returned"""
     fl_cls = api.ForeningLet()
     memberlist = fl_cls.get_memberlist()
-    assert isinstance(memberlist, str)
+    assert isinstance(memberlist, list)
 
 
 def test_get_mocked_memberlist(mocked_memberlist):

@@ -23,6 +23,17 @@ class Memberlist:
     memberlist_dataframe = pd.DataFrame()
     members_age_list = {}
 
+    def __new__(cls, *args):
+        """Make sure we create a clean memberlist object every time"""
+        cls.count_men = 0
+        cls.count_women = 0
+        cls.genuine_member_count = 0
+        cls.member_count = 0
+        cls.memberlist = ""
+        cls.memberlist_dataframe = pd.DataFrame()
+        cls.members_age_list = {}
+        return super().__new__(cls)
+
     def __init__(self, memberlist) -> None:
         self.memberlist = memberlist
         self._load_memberlist_to_dataframe()
@@ -82,12 +93,13 @@ class Memberlist:
         """
         min_age = 0
         max_age = 0
+        debug_count = 0
         for member in self.memberlist:
+            debug_count += 1
             birthday = datetime.strptime(member["Birthday"], "%Y-%m-%d")
             now = datetime.now()
             diff = relativedelta(now, birthday)
             age = diff.years
-
             if self.members_age_list.get(age, None) is None:
                 self.members_age_list[age] = 1
             else:
@@ -102,4 +114,7 @@ class Memberlist:
             if self.members_age_list.get(i, None) is None:
                 self.members_age_list[i] = 0
         # The list should be sorted by age ascending
-        self.members_age_list = dict(sorted(self.members_age_list.items()))
+
+        sorted_list = dict(sorted(self.members_age_list.items()))
+        self.members_age_list = {}
+        self.members_age_list = sorted_list

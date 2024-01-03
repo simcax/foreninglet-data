@@ -100,10 +100,12 @@ def test_memberlist_age_counts_totals_returns_dict_matching_genuine_membercount(
     """
     Test to retrieve the number of members for each age group
     """
-    memberlist = mocked_memberlist(20)
-    memberlist_obj = Memberlist(memberlist)
-    age_counts = memberlist_obj.members_age_list
+    this_memberlist = mocked_memberlist(20)
+    my_memberlist_obj = Memberlist(this_memberlist)
+    age_counts = my_memberlist_obj.members_age_list
+    print(f"Age count count:{len(age_counts)}")
     member_counts_total = 0
     for member_count in age_counts.values():
         member_counts_total += member_count
+        print(f"Member count: {member_count} ")
     assert member_counts_total == 20
