@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foreninglet-data"
-version = "0.2.1"
+version = "0.2.2"
 description = "A way to retrieve information about members from the ForeningLet API (www.foreninglet.dk) - ForeningLet is a member system for small (typically) voluntary organizations in Denmark"
 authors = ["Carsten Skov <carsten@simcax.dk>"]
 readme = "README.md"
@@ -8,7 +8,7 @@ packages = [{include = "foreninglet_data"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-dataclasses-json = "^0.5.7"
+dataclasses-json = ">=0.5.7,<0.7.0"
 requests = "^2.31.0"
 pandas = "^2.1.4"
 pytest-vcr = "^1.0.2"
@@ -17,7 +17,7 @@ pytest-vcr = "^1.0.2"
 black = {version = "^23.7.0", allow-prereleases = true}
 dagger-io = "^0.9.5"
 typer = "^0.9.0"
-faker = "^19.2.0"
+faker = ">=19.2,<23.0"
 python-dotenv = "1.0.0"
 pandas = "^2.1.4"
 sphinx = "^7.2.6"
