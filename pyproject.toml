@@ -8,7 +8,7 @@ packages = [{include = "foreninglet_data"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-dataclasses-json = "^0.5.7"
+dataclasses-json = ">=0.5.7,<0.7.0"
 requests = "^2.31.0"
 pandas = "^2.1.4"
 pytest-vcr = "^1.0.2"
