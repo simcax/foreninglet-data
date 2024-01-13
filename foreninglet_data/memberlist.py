@@ -6,6 +6,7 @@ from datetime import datetime
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+from loguru import logger
 
 
 class Memberlist:
@@ -93,9 +94,11 @@ class Memberlist:
         """
         min_age = 0
         max_age = 0
-        debug_count = 0
         for member in self.memberlist:
-            debug_count += 1
+            if member["Birthday"] == "":
+                corrected_birthday = datetime.today().strftime("%Y-%m-%d")
+                logger.warning = f"Corrected birthday to be {corrected_birthday} for memberid: {member['MemberId']}, memberNumber: {member['MemberNumber']}, name: {member['FirstName']} {member['LastName']} "
+                member["Birthday"] = corrected_birthday
             birthday = datetime.strptime(member["Birthday"], "%Y-%m-%d")
             now = datetime.now()
             diff = relativedelta(now, birthday)

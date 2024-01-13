@@ -46,7 +46,7 @@ def test_get_mocked_memberlist(mocked_memberlist):
     """
     Test getting a mocked memberlist
     """
-    memberlist = mocked_memberlist(10)
+    memberlist = mocked_memberlist(10, 0)
     assert isinstance(memberlist, list)
 
 
@@ -54,5 +54,5 @@ def test_get_mocked_memberlist_json(mocked_memberlist):
     """
     Test getting a mocked memberlist in JSON
     """
-    memberlist = mocked_memberlist(2)
+    memberlist = mocked_memberlist(2, 0)
     assert len(memberlist) == 2

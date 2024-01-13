@@ -14,7 +14,7 @@ def test_memberlist_isobject(mocked_memberlist):
     """
     A test to see a memberlist object has the correct membercount attribute
     """
-    memberlist_obj = Memberlist(mocked_memberlist(2))
+    memberlist_obj = Memberlist(mocked_memberlist(2, 0))
     assert isinstance(memberlist_obj, object)
 
 
@@ -22,7 +22,7 @@ def test_memberlist_loads_memberlist(mocked_memberlist):
     """
     Test to make sure the passed memberlist is held by the memberlist object
     """
-    memberlist = mocked_memberlist(5)
+    memberlist = mocked_memberlist(5, 0)
     memberlist_obj = Memberlist(memberlist)
     assert memberlist_obj.memberlist == memberlist
 
@@ -31,7 +31,7 @@ def test_memberlist_has_correct_membercount(mocked_memberlist):
     """
     Tests the memberlist object to initialize the count of members as an attribute
     """
-    memberlist = mocked_memberlist(11)
+    memberlist = mocked_memberlist(11, 0)
     memberlist_obj = Memberlist(memberlist)
     assert memberlist_obj.member_count == 11
 
@@ -41,7 +41,7 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     Tests the memberlist object to initialize the count of members for each gender
     as attributes
     """
-    memberlist = mocked_memberlist(12)
+    memberlist = mocked_memberlist(12, 0)
     df = pd.read_json(json.dumps(memberlist))
     groups = df.groupby("Gender").size()
     males = 0
@@ -75,7 +75,7 @@ def test_memberlist_only_genuine_members(mocked_memberlist):
     """
     Test to only get members where genuinemember == 1
     """
-    memberlist = mocked_memberlist(20)
+    memberlist = mocked_memberlist(20, 0)
     memberlist_obj = Memberlist(memberlist)
 
     gen_member_count = 0
@@ -88,7 +88,7 @@ def test_memberlist_age_counts_totals_returns_dict(mocked_memberlist):
     """
     Test to retrieve the number of members for each age group
     """
-    memberlist = mocked_memberlist(20)
+    memberlist = mocked_memberlist(20, 0)
     memberlist_obj = Memberlist(memberlist)
     age_counts = memberlist_obj.members_age_list
     assert isinstance(age_counts, dict)
@@ -100,7 +100,7 @@ def test_memberlist_age_counts_totals_returns_dict_matching_genuine_membercount(
     """
     Test to retrieve the number of members for each age group
     """
-    this_memberlist = mocked_memberlist(20)
+    this_memberlist = mocked_memberlist(20, 0)
     my_memberlist_obj = Memberlist(this_memberlist)
     age_counts = my_memberlist_obj.members_age_list
     print(f"Age count count:{len(age_counts)}")
@@ -109,3 +109,13 @@ def test_memberlist_age_counts_totals_returns_dict_matching_genuine_membercount(
         member_counts_total += member_count
         print(f"Member count: {member_count} ")
     assert member_counts_total == 20
+
+
+def test_memberlist_works_with_wrong_birthday(mocked_memberlist):
+    """
+    Tests the memberlist object to initialize the count of members as an attribute
+    """
+    memberlist = mocked_memberlist(1, 0)
+    memberlist[0]["Birthday"] = ""
+    memberlist_obj = Memberlist(memberlist)
+    assert memberlist_obj.member_count == 1

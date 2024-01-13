@@ -186,7 +186,7 @@ def mocked_memberlist():
     Fixture for creating fake memberlist data
     """
 
-    def _mocked_memberlist(membercount: int):
+    def _mocked_memberlist(membercount: int, non_genuine_members: int) -> str:
         """Returns a mocked / fake memberlist"""
         # Generate a memberlist of mocked members
         memberlist = ""
