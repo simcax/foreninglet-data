@@ -1,22 +1,24 @@
 name: Manual Release
-on:
+on:  
   workflow_dispatch:
     inputs:
       package_version:
-        description: 'Package Version'
-        required: true
-        default: '0.0.0'
-
-    - name: Do a Github Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }} {{ env.package_version }}
-          release_name: Release v${{env.PACKAGE_VERSION}} ${{ github.ref }}
-          body_path: releasenotes/${{env.PACKAGE_VERSION}}.md
-          draft: false
-          prerelease: true
-          repo: ${{ github.repository }}
+      description: 'Package Version'
+      required: true
+      default: '0.0.0'
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+    steps:
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }} {{ env.package_version }}
+        release_name: Release v${{env.PACKAGE_VERSION}} ${{ github.ref }}
+        body_path: releasenotes/${{env.PACKAGE_VERSION}}.md
+        draft: false
+        prerelease: true
+        repo: ${{ github.repository }}
 
