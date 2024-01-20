@@ -39,7 +39,8 @@ jobs:
         with:
           tag_name: v${PACKAGE_VERSION}
           release_name: Release v${PACKAGE_VERSION}
-          body_path: releasenotes/${version}.md)
+          
+          body_path: releasenotes/${{ env.PACKAGE_VERSION }}.md
           draft: false
           prerelease: true
       

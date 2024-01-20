@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foreninglet-data"
-version = "0.3.0"
+version = "0.3.1"
 description = "A way to retrieve information about members from the ForeningLet API (www.foreninglet.dk) - ForeningLet is a member system for small (typically) voluntary organizations in Denmark"
 authors = ["Carsten Skov <carsten@simcax.dk>"]
 readme = "README.md"
