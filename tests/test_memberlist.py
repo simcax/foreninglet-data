@@ -2,9 +2,11 @@
 Testing the ForeningLet Data Memberlist class
 """
 import json
+from datetime import datetime
 
 import pandas as pd
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from foreninglet_data.api import ForeningLet
 from foreninglet_data.memberlist import Memberlist
@@ -119,3 +121,54 @@ def test_memberlist_works_with_wrong_birthday(mocked_memberlist):
     memberlist[0]["Birthday"] = ""
     memberlist_obj = Memberlist(memberlist)
     assert memberlist_obj.member_count == 1
+
+
+def test_new_member_per_month(mocked_memberlist):
+    """Test retrieving a list of new members per month"""
+    memberlist = mocked_memberlist(30, 0)
+    for member in memberlist:
+        # set member['EnrollmentDate'] to same day last month
+        member["EnrollmentDate"] = (
+            datetime.today() - relativedelta(months=1)
+        ).strftime("%Y-%m-%d")
+        # update the memberlist with the new EnrollmentDate
+        memberlist[memberlist.index(member)] = member
+    current_date = datetime.strptime(datetime.today().strftime("%Y-%m"), "%Y-%m")
+    months_back_1 = (current_date - relativedelta(months=1)).strftime("%Y-%m")
+    member_obj = Memberlist(memberlist)
+    df = member_obj.memberlist_dataframe
+    # extract EnrollmentDate from a dataframe,
+    # change from string to datetime, then format EnrollmentDate from year month day to year month
+    df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+    # group the dataframe by year and month and count the number of members in each group
+    df_dates = df.groupby(df["EnrollmentDate"].dt.strftime("%Y-%m")).size()
+    # assert the number of members enrolled in the last month equals the number of rows
+    # in the memberlist list of json data matching the EnrollmentDate
+
+    assert df_dates[months_back_1] == member_obj.new_members_previous_month
+
+
+# Test the number of members with an EnrollmentDate in the current month
+def test_count_new_members_current_month(mocked_memberlist):
+    """
+    Test to count the number of members with an EnrollmentDate in the current month
+    """
+    memberlist = mocked_memberlist(30, 0)
+    for member in memberlist:
+        # set member['EnrollmentDate'] to same day last month
+        member["EnrollmentDate"] = datetime.today().strftime("%Y-%m-%d")
+        # update the memberlist with the new EnrollmentDate
+        memberlist[memberlist.index(member)] = member
+    member_obj = Memberlist(memberlist)
+    df = member_obj.memberlist_dataframe
+    # extract EnrollmentDate from a dataframe,
+    # change from string to datetime, then format EnrollmentDate from year month day to year month
+    df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+    # group the dataframe by year and month and count the number of members in each group
+    df_dates = df.groupby(df["EnrollmentDate"].dt.strftime("%Y-%m")).size()
+    # assert the number of members enrolled in the last month equals the number of rows
+    # in the memberlist list of json data matching the EnrollmentDate
+    assert (
+        df_dates[datetime.today().strftime("%Y-%m")]
+        == member_obj.new_members_current_month
+    )

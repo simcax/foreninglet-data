@@ -49,6 +49,12 @@ Retrieve the membercount:
 memberlist.member_count
 # All the GenuineMembers
 memberlist.genuine_member_count
+# The number of new members in the current month
+memberlist.new_members_current_month
+memberlist.new_members_current_month_percentage
+# The number of new members in the previous month
+memberlist.new_members_previous_month
+memberlist.new_members_previous_month_percentage
 ```
 
 Retrieve the count of genders:
