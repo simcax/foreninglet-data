@@ -21,7 +21,7 @@ jobs:
         with:
           tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }}
           release_name: Release v${{env.PACKAGE_VERSION}} ${{ github.ref }}
-          body_path: ../../releasenotes/${{ env.PACKAGE_VERSION }}.md
+          body_path: releasenotes/${{ env.PACKAGE_VERSION }}.md
           draft: false
           prerelease: true
           repo: ${{ github.repository }}
