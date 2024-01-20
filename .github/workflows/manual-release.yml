@@ -1,10 +1,11 @@
 on:  
   workflow_dispatch:
     inputs:
-      package_version:
+      packageVersion:
       description: 'Package Version'
       required: true
       default: '0.0.0'
+    
 
 jobs:
   github-release:
@@ -15,10 +16,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }} {{ env.package_version }}
+          tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }}
           release_name: Release v${{env.PACKAGE_VERSION}} ${{ github.ref }}
           body_path: releasenotes/${{env.PACKAGE_VERSION}}.md
           draft: false
           prerelease: true
           repo: ${{ github.repository }}
+        env:
+          PACKAGE_VERSION: ${{ github.event.inputs.packageVersion }}
+
 
