@@ -5,6 +5,7 @@ on:
       description: 'Package Version'
       required: true
       default: '0.0.0'
+
 jobs:
   github-release:
     runs-on: ubuntu-latest
