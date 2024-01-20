@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Get release version
-        run: echo "PACKAGE_VERSION=$(cat pyproject.toml|grep ^version|cut -d= -f2|tr -d \")"" >> $GITHUB_ENV
+        run: echo "PACKAGE_VERSION=$(cat pyproject.toml|grep ^version|cut -d= -f2|tr -d \")" >> $GITHUB_ENV
       - name: Install dependencies
         run: python -m pip install poetry
       - name: Build release
