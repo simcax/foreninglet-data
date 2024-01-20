@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "foreninglet-data"
-version = "0.2.3"
+version = "0.3.0"
 description = "A way to retrieve information about members from the ForeningLet API (www.foreninglet.dk) - ForeningLet is a member system for small (typically) voluntary organizations in Denmark"
 authors = ["Carsten Skov <carsten@simcax.dk>"]
 readme = "README.md"
@@ -22,6 +22,7 @@ faker = ">=19.2,<23.0"
 python-dotenv = "1.0.0"
 pandas = "^2.1.4"
 sphinx = "^7.2.6"
+pytest-cov = "^4.1.0"
 
 
 [build-system]

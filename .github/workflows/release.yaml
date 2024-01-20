@@ -14,10 +14,13 @@ jobs:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'poetry'
+      - name: Get release version
+        run: echo "PACKAGE_VERSION=$(cat pyproject.toml|grep ^version|cut -d= -f2|tr -d \")"" >> $GITHUB_ENV
       - name: Install dependencies
         run: python -m pip install poetry
       - name: Build release
@@ -29,3 +32,15 @@ jobs:
           path: dist/*.whl
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Do a Github Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${PACKAGE_VERSION}
+          release_name: Release v${PACKAGE_VERSION}
+          body_path: releasenotes/${version}.md)
+          draft: false
+          prerelease: true
+      

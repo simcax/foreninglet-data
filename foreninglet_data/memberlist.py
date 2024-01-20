@@ -23,6 +23,7 @@ class Memberlist:
     count_women = 0
     memberlist_dataframe = pd.DataFrame()
     members_age_list = {}
+    new_members_previous_month = 0
 
     def __new__(cls, *args):
         """Make sure we create a clean memberlist object every time"""
@@ -33,6 +34,10 @@ class Memberlist:
         cls.memberlist = ""
         cls.memberlist_dataframe = pd.DataFrame()
         cls.members_age_list = {}
+        cls.new_members_previous_month = 0
+        cls.new_members_previous_month_percentage = 0
+        cls.new_members_current_month = 0
+        cls.new_members_current_month_percentage = 0
         return super().__new__(cls)
 
     def __init__(self, memberlist) -> None:
@@ -42,6 +47,8 @@ class Memberlist:
         self._count_genuine_members()
         self._count_genders()
         self._create_member_ages_list()
+        self._set_new_members_previous_month()
+        self.set_new_members_current_month()
 
     def _count_members(self):
         """
@@ -121,3 +128,75 @@ class Memberlist:
         sorted_list = dict(sorted(self.members_age_list.items()))
         self.members_age_list = {}
         self.members_age_list = sorted_list
+
+    # A method counting the number of members with an EnrollmentDate in the previous month
+    def count_new_members_previous_month(self):
+        """
+        Method to count the number of members with an EnrollmentDate in the previous month
+        """
+        df = self.memberlist_dataframe
+        now = datetime.now()
+        prev_month = now.month - 1 if now.month > 1 else 12
+        prev_year = now.year - 1 if now.month == 1 else now.year
+        # convert EnrollmentDate to datetime
+        df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+        prev_month_members = df.loc[
+            (df["EnrollmentDate"].dt.month == prev_month)
+            & (df["EnrollmentDate"].dt.year == prev_year)
+        ]
+        return len(prev_month_members)
+
+    # A method setting class attributes for the number of members with an EnrollmentDate in the previous month
+    def _set_new_members_previous_month(self):
+        """
+        Method to set class attributes for the number of members with an EnrollmentDate in the previous month
+        """
+        self.new_members_previous_month = self.count_new_members_previous_month()
+        self.new_members_previous_month_percentage = (
+            self.new_members_previous_month / self.member_count * 100
+        )
+        self.new_members_previous_month_percentage = round(
+            self.new_members_previous_month_percentage, 2
+        )
+        self.new_members_previous_month_percentage = (
+            f"{self.new_members_previous_month_percentage}%"
+        )
+        self.new_members_previous_month_percentage = (
+            self.new_members_previous_month_percentage.replace(".", ",")
+        )
+
+    # Method to get the number of members with an EnrollmentDate in the current month
+    def count_new_members_current_month(self):
+        """
+        Method to count the number of members with an EnrollmentDate in the current month
+        """
+        df = self.memberlist_dataframe
+        now = datetime.now()
+        current_month = now.month
+        current_year = now.year
+        # convert EnrollmentDate to datetime
+        df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+        current_month_members = df.loc[
+            (df["EnrollmentDate"].dt.month == current_month)
+            & (df["EnrollmentDate"].dt.year == current_year)
+        ]
+        return len(current_month_members)
+
+    # Method to set class attributes for the number of members with an EnrollmentDate in the current month
+    def set_new_members_current_month(self):
+        """
+        Method to set class attributes for the number of members with an EnrollmentDate in the current month
+        """
+        self.new_members_current_month = self.count_new_members_current_month()
+        self.new_members_current_month_percentage = (
+            self.new_members_current_month / self.member_count * 100
+        )
+        self.new_members_current_month_percentage = round(
+            self.new_members_current_month_percentage, 2
+        )
+        self.new_members_current_month_percentage = (
+            f"{self.new_members_current_month_percentage}%"
+        )
+        self.new_members_current_month_percentage = (
+            self.new_members_current_month_percentage.replace(".", ",")
+        )
