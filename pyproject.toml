@@ -19,7 +19,7 @@ black = {version = "^23.7.0", allow-prereleases = true}
 dagger-io = "^0.9.5"
 typer = "^0.9.0"
 faker = ">=19.2,<23.0"
-python-dotenv = "1.0.0"
+python-dotenv = "1.0.1"
 pandas = "^2.1.4"
 sphinx = "^7.2.6"
 pytest-cov = "^4.1.0"
