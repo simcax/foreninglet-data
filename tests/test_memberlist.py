@@ -1,11 +1,13 @@
 """
 Testing the ForeningLet Data Memberlist class
 """
+
 import json
 from datetime import datetime
 
 import pandas as pd
 import pytest
+import vcr
 from dateutil.relativedelta import relativedelta
 
 from foreninglet_data.api import ForeningLet
@@ -61,6 +63,7 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     assert memberlist_obj.count_women == females
 
 
+@vcr.use_cassette("tests/cassettes/test_data_fl_api_get_anon.yaml")
 @pytest.mark.vcr()
 def test_memberlist_class_works_with_real_api_data():
     """
@@ -171,4 +174,45 @@ def test_count_new_members_current_month(mocked_memberlist):
     assert (
         df_dates[datetime.today().strftime("%Y-%m")]
         == member_obj.new_members_current_month
+    )
+
+
+def test_members_per_year(mocked_memberlist):
+    """
+    Test to count the number of members per year
+    """
+    memberlist = mocked_memberlist(30, 0)
+    year_subtract = 0
+    for member in memberlist:
+        # Set member['EnrollmentDate'] to same day last year
+        member["EnrollmentDate"] = (
+            datetime.today() - relativedelta(years=year_subtract)
+        ).strftime("%Y-%m-%d")
+        member["GenuineMember"] = 1
+        # For every 5 members subtract one year from the EnrollmentDate
+        if memberlist.index(member) % 5 == 0:
+            year_subtract += 1
+        # update the memberlist with the new EnrollmentDate
+        memberlist[memberlist.index(member)] = member
+    member_obj = Memberlist(memberlist)
+    df = member_obj.memberlist_dataframe
+    # Count number members per year from earliest year to latest year, but only where GenuineMember == 1
+    df_dates = (
+        df[df["GenuineMember"] == 1]
+        .groupby(df["EnrollmentDate"].dt.strftime("%Y"))
+        .size()
+    )
+    # Get the highest value from the df_dates series
+    earliest_year = df_dates.index.min()
+
+    # Get the latest year from the dataframe
+    latest_year = df_dates.index.max()
+
+    # Count number members per year
+    df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+
+    assert df_dates[latest_year] == member_obj.members_current_year
+    assert (
+        df_dates[(datetime.today() - relativedelta(years=1)).strftime("%Y")]
+        == member_obj.members_last_year
     )

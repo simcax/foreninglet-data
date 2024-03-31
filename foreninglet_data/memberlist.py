@@ -1,6 +1,7 @@
 """
 Class for handling the ForeningLet Memberlist data
 """
+
 import json
 from datetime import datetime
 
@@ -24,6 +25,9 @@ class Memberlist:
     memberlist_dataframe = pd.DataFrame()
     members_age_list = {}
     new_members_previous_month = 0
+    members_current_year = 0
+    members_last_year = 0
+    members_per_year = {}
 
     def __new__(cls, *args):
         """Make sure we create a clean memberlist object every time"""
@@ -38,6 +42,8 @@ class Memberlist:
         cls.new_members_previous_month_percentage = 0
         cls.new_members_current_month = 0
         cls.new_members_current_month_percentage = 0
+        cls.members_current_year = 0
+        cls.members_per_year = {}
         return super().__new__(cls)
 
     def __init__(self, memberlist) -> None:
@@ -49,6 +55,7 @@ class Memberlist:
         self._create_member_ages_list()
         self._set_new_members_previous_month()
         self.set_new_members_current_month()
+        self.set_members_per_year()
 
     def _count_members(self):
         """
@@ -200,3 +207,38 @@ class Memberlist:
         self.new_members_current_month_percentage = (
             self.new_members_current_month_percentage.replace(".", ",")
         )
+
+    # METHOD to count the number of members per year
+    def count_members_per_year(self):
+        """
+        Method to count the number of members per year
+        """
+        df = self.memberlist_dataframe
+        # convert EnrollmentDate to datetime
+        df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+        df_dates = (
+            df[df["GenuineMember"] == 1]
+            .groupby(df["EnrollmentDate"].dt.strftime("%Y"))
+            .size()
+        )
+        return df_dates
+
+    def set_members_per_year(self):
+        """
+        Method to set class attributes for the number of members per year
+        """
+        self.members_per_year = self.count_members_per_year()
+        self.members_current_year = self.members_per_year.get(
+            datetime.today().strftime("%Y"), 0
+        )
+        self.members_last_year = self.members_per_year.get(
+            (datetime.today() - relativedelta(years=1)).strftime("%Y"), 0
+        )
+        self.members_per_year = self.members_per_year.to_dict()
+        self.members_per_year = dict(sorted(self.members_per_year.items()))
+
+    def get_addresses_and_zip_numbers(self) -> None:
+        """Method to extract street addresses and zip numbers as a csv file"""
+        df = self.memberlist_dataframe
+        addresses = df[["Address", "Zip"]]
+        addresses.to_csv("addresses.csv", index=False)
