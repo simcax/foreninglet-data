@@ -43,8 +43,11 @@ async def test():
             .with_env_variable("API_VERSION", "version=1")
             .with_env_variable("API_MEMBERS_API", "members")
             .with_env_variable("API_ACTIVITIES_API", "activities")
+            .with_env_variable("API_RESIGNED_MEMBERS_API", "members/status/resigned")
+            .with_env_variable("MEMBERSHIP_KEYWORDS", "medlemskab,medlemsskab")
+            .with_env_variable("TEST_ENVIRONMENT", "True")
             # Check standards
-            .with_exec(["black", "--check", "."])
+            .with_exec(["black", "--check", "--diff", "--color", "."])
             # run tests
             .with_exec(
                 [
