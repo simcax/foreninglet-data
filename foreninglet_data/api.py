@@ -8,6 +8,18 @@ import requests
 
 from foreninglet_data.activities import Activities
 
+if environ.get("TEST_ENVIRONMENT"):
+    from vcr import use_cassette
+else:
+    # Define a no-op decorator for production
+    def use_cassette(*args, **kwargs):
+        """Mocking decorator for production environment"""
+
+        def decorator(func):
+            return func
+
+        return decorator
+
 
 class ForeningLet:
     """
@@ -71,6 +83,7 @@ class ForeningLet:
         resp = self.fl_api_get(self.api_members_url)
         return json.loads(resp.text)
 
+    @use_cassette("tests/cassettes/test_data_fl_api_activities_anon.yaml")
     @lru_cache(maxsize=1280)
     def get_activities(self):
         """Retrieves all activities from the activities API endpoint"""
