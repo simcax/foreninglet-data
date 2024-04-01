@@ -1,6 +1,7 @@
 """
-    Anonymise data files for testing
+Anonymise data files for testing
 """
+
 import json
 import os
 import random
@@ -20,7 +21,7 @@ app = typer.Typer(
 def anonymize_data(
     input_file: Annotated[
         (str, typer.Argument(help="Full path to the file needed to be anonimized"))
-    ] = None
+    ] = None,
 ) -> bool:
     """
     Loads input file and anonymizes the data,

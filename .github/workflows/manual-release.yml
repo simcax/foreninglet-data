@@ -5,6 +5,10 @@ on:
         description: 'Package Version'
         required: true
         default: '0.0.0'
+      commit_sha:
+        description: 'Commit SHA'
+        required: true
+        default: ''
     
 
 jobs:
@@ -18,13 +22,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PACKAGE_VERSION: ${{ github.event.inputs.packageVersion }}
+          COMMIT_SHA: ${{ github.event.inputs.commit_sha }}
         with:
           tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }}
-          release_name: Release v${{env.PACKAGE_VERSION}} ${{ github.ref }}
+          release_name: Release v${{ env.PACKAGE_VERSION }} ${{ github.ref }}
           body_path: releasenotes/${{ env.PACKAGE_VERSION }}.md
           draft: false
           prerelease: true
           repo: ${{ github.repository }}
-          
+          commitish: ${{ env.COMMIT_SHA }}
 
 
