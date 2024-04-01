@@ -1,6 +1,7 @@
 import json
 
 import pytest
+import vcr
 
 import foreninglet_data
 from foreninglet_data import api
@@ -26,6 +27,7 @@ def test_api_call_fail_on_no_password():
     assert fl_cls.check_api_responds() is True
 
 
+@vcr.use_cassette("tests/cassettes/test_data_fl_api_get_anon.yaml")
 @pytest.mark.vcr()
 def test_api_call_succeed():
     """Tests the API call to ForeningLet succeeding when credentials has been provided"""
@@ -34,6 +36,7 @@ def test_api_call_succeed():
     assert fl_cls.check_api_responds() == 200
 
 
+@vcr.use_cassette("tests/cassettes/test_data_fl_api_get_anon.yaml")
 @pytest.mark.vcr()
 def test_get_memberlist():
     """Test the list of members being returned"""
