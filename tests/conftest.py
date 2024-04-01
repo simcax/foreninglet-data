@@ -1,4 +1,5 @@
 """Test configuration for the ForeningLet Data module"""
+
 import json
 import sys
 from random import randint

@@ -1,0 +1,56 @@
+# Anonymized test data for the ForeningLet API activities endpoint
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+    method: GET
+    uri: https://foreninglet.dk/api/activities?version=1
+  response:
+    body:
+      string: '[{"ActivityId":"45050","Name":"Halv\u00e5rs medlemsskab","PriceNow":"750.00","OnlineEnrollmentEnabled":"1","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[{"Headline":"Pris","Text":"750,00
+        DKK"},{"Headline":"Alder","Text":"15-127 \u00e5r (f\u00f8dsels\u00e5r 1897-2009)"},{"Headline":"Betalingsmuligheder","Text":"<ul><li>Via
+        Dankort eller internationalt kreditkort<li>Via Dankort eller internationalt
+        kreditkort (tilmelding til abonnement)<\/ul>"},{"Headline":"Indmeldelsesgebyr","Text":"Hvis
+        du ikke tidligere har v\u00e6ret medlem, vil du blive opkr\u00e6vet 150 kr.
+        i indmeldingsgebyr. Er du p\u00e5 din e-mail adresse blevet registreret, som
+        st\u00f8ttemedlem vil dette v\u00e6re reduceret til 50 kr. <br \/>\nFor at
+        du f\u00e5r det reducerede indmeldingsgebyr, skal du logge ind med din e-mail
+        adresse samt det tilsendte password. <br \/>\n"}],"Categories":[],"DepartmentId":"6205"},{"ActivityId":"45051","Name":"Hel\u00e5rs
+        medlemsskab","PriceNow":"1250.00","OnlineEnrollmentEnabled":"1","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[{"Headline":"Pris","Text":"1.250,00
+        DKK"},{"Headline":"Alder","Text":"15-127 \u00e5r (f\u00f8dsels\u00e5r 1897-2009)"},{"Headline":"Betalingsmuligheder","Text":"<ul><li>Via
+        Dankort eller internationalt kreditkort<li>Via Dankort eller internationalt
+        kreditkort (tilmelding til abonnement)<\/ul>"}],"Categories":[],"DepartmentId":"6205"},{"ActivityId":"86407","Name":"3 m\u00e5neders medlemskab","PriceNow":"400.00","OnlineEnrollmentEnabled":"1","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[{"Headline":"Pris","Text":"400,00
+        DKK"},{"Headline":"Alder","Text":"15-127 \u00e5r (f\u00f8dsels\u00e5r 1897-2009)"},{"Headline":"Betalingsmuligheder","Text":"<ul><li>Via
+        Dankort eller internationalt kreditkort<li>Via Dankort eller internationalt
+        kreditkort (tilmelding til abonnement)<\/ul>"}],"Categories":[],"DepartmentId":"6205"},{"ActivityId":"68173","Name":"Bestyrelse","PriceNow":0,"OnlineEnrollmentEnabled":"0","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[],"Categories":[],"DepartmentId":"6208"},
+        {"ActivityId":"68183","Name":"Reng\u00f8ringspersonale","PriceNow":0,"OnlineEnrollmentEnabled":"0","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[],"Categories":[],"DepartmentId":"6208"},
+        {"ActivityId":"51894","Name":"Instrukt\u00f8r","PriceNow":"0.00","OnlineEnrollmentEnabled":"0","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[],"Categories":[],"DepartmentId":"6206"},
+        {"ActivityId":"101630","Name":"Husstandsmeldemskab","PriceNow":0,"OnlineEnrollmentEnabled":"0","SettlementDate":"0000-00-00T00:00:00+0000","CloseDate":"0000-00-00T00:00:00+0000","ExternalDescriptions":[],"Categories":[],"DepartmentId":"6208"}]'
+    headers:
+      Connection:
+      - Keep-Alive
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 28 Mar 2024 15:09:40 GMT
+      Keep-Alive:
+      - timeout=5, max=100
+      Server:
+      - Apache/2.4.33 (Amazon) OpenSSL/1.0.2k-fips
+      Set-Cookie:
+      - cisession=99eed5491e2c47cda3a8f702151b9247; expires=Fri, 29-Mar-2024 15:09:40
+        GMT; Max-Age=86400; path=/
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1
