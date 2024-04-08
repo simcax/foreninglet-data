@@ -31,6 +31,16 @@ jobs:
           path: dist/*.whl
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Extract version from commit message
+        id: extract-version
+        run: |
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          VERSION=v${{env.PACKAGE_VERSION}}
+          echo "::set-output name=version::$VERSION"
+      - name: Create tag
+        run: |
+          git tag ${{ steps.extract-version.outputs.version }}
+          git push origin ${{ steps.extract-version.outputs.version }}
       - name: Do a Github Release
         id: create_release
         uses: actions/create-release@v1
@@ -42,4 +52,3 @@ jobs:
           body_path: releasenotes/${{env.PACKAGE_VERSION}}.md
           draft: false
           prerelease: true
-      
