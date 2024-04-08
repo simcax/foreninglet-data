@@ -16,10 +16,10 @@ pydantic = "^2.6.4"
 
 [tool.poetry.group.dev.dependencies]
 black = {version = "^23.7.0", allow-prereleases = true}
+python-dotenv = "1.0.1"
 dagger-io = ">=0.9.5,<0.12.0"
 faker = ">=19.2,<25.0"
 typer = ">=0.9,<0.13"
-python-dotenv = "1.0.0"
 pandas = "^2.1.4"
 sphinx = "^7.2.6"
 pytest-cov = ">=4.1,<6.0"
