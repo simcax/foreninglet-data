@@ -38,7 +38,7 @@ class TestUtils:
         membership_keywords = ["medlemskab", "medlemsskab"]
         memberships = activity_obj.identify_memberships(tuple(membership_keywords))
         activity_ids = random.choice(list(memberships.keys()))
-        sex = {"M": "M", "F": "K"}
+        sex = {"M": "Mand", "F": "Kvinde"}
         fake = Faker("da_DK")
         member_data_dict = {
             "MemberId": random.randint(0, 1000),

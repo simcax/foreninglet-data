@@ -48,8 +48,6 @@ interactions:
       Set-Cookie:
       - cisession=99eed5491e2c47cda3a8f702151b9247; expires=Fri, 29-Mar-2024 15:09:40
         GMT; Max-Age=86400; path=/
-      Transfer-Encoding:
-      - chunked
     status:
       code: 200
       message: OK

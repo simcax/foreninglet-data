@@ -47,24 +47,25 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     """
     memberlist = mocked_memberlist(12, 0)
     df = pd.read_json(json.dumps(memberlist))
-    groups = df.groupby("Gender").size()
-    males = 0
-    females = 0
+    groups = df[df["GenuineMember"] == 1].groupby("Gender").size()
+    men = 0
+    women = 0
     if groups.get("M", "") != "":
-        males = groups["M"]
+        men = groups["M"]
     if groups.get("Mand", "") != "":
-        males += groups["Mand"]
+        men += groups["Mand"]
     if groups.get("K", "") != "":
-        females = groups["K"]
+        women = groups["K"]
     if groups.get("Kvinde", "") != "":
-        females += groups["Kvinde"]
+        women += groups["Kvinde"]
     memberlist_obj = Memberlist(memberlist)
-    assert memberlist_obj.count_men == males
-    assert memberlist_obj.count_women == females
+    assert memberlist_obj.count_men == int(men)
+    assert memberlist_obj.count_women == int(women)
 
 
 @vcr.use_cassette("tests/cassettes/test_data_fl_api_get_anon.yaml")
 @pytest.mark.vcr()
+@pytest.mark.integration
 def test_memberlist_class_works_with_real_api_data():
     """
     Tests the memberlist class works with memberlist data
@@ -216,3 +217,34 @@ def test_members_per_year(mocked_memberlist):
         df_dates[(datetime.today() - relativedelta(years=1)).strftime("%Y")]
         == member_obj.members_last_year
     )
+
+
+def test_members_per_year_per_gender(mocked_memberlist):
+    memberlist = mocked_memberlist(30, 0)
+    year_subtract = 0
+    for member in memberlist:
+        # Set member['EnrollmentDate'] to same day last year
+        member["EnrollmentDate"] = (
+            datetime.today() - relativedelta(years=year_subtract)
+        ).strftime("%Y-%m-%d")
+        member["GenuineMember"] = 1
+        # For every 5 members subtract one year from the EnrollmentDate
+        if memberlist.index(member) % 5 == 0:
+            year_subtract += 1
+        # update the memberlist with the new EnrollmentDate
+        memberlist[memberlist.index(member)] = member
+    member_obj = Memberlist(memberlist)
+    df = member_obj.memberlist_dataframe
+    # Count number members per year from earliest year to latest year, but only where GenuineMember == 1
+    df_dates = df[df["GenuineMember"] == 1].groupby(
+        [df["EnrollmentDate"].dt.strftime("%Y")]
+    )
+    df_gender_counts = df_dates["Gender"].value_counts().unstack().fillna(0)
+    latest_year = datetime.today().strftime("%Y")
+    last_year = (datetime.today() - relativedelta(years=1)).strftime("%Y")
+    member_obj.set_members_per_gender_per_year()
+
+    assert df_gender_counts.loc[latest_year, "Mand"] == member_obj.men_current_year
+    assert df_gender_counts.loc[latest_year, "Kvinde"] == member_obj.women_current_year
+    assert df_gender_counts.loc[last_year, "Mand"] == member_obj.men_last_year
+    assert df_gender_counts.loc[last_year, "Kvinde"] == member_obj.women_last_year

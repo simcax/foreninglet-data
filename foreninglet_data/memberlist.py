@@ -23,11 +23,22 @@ class Memberlist:
     count_men = 0
     count_women = 0
     memberlist_dataframe = pd.DataFrame()
+    memberlist_dataframe_genuine_members = pd.DataFrame()
     members_age_list = {}
     new_members_previous_month = 0
     members_current_year = 0
     members_last_year = 0
     members_per_year = {}
+    women_current_year = 0
+    women_last_year = 0
+    women_per_year = {}
+    men_current_year = 0
+    men_last_year = 0
+    men_per_year = {}
+    resignations_per_year = {}
+    resignations_total = 0
+    resignations_per_year_female = {}
+    resignations_per_year_male = {}
 
     def __new__(cls, *args):
         """Make sure we create a clean memberlist object every time"""
@@ -37,6 +48,7 @@ class Memberlist:
         cls.member_count = 0
         cls.memberlist = ""
         cls.memberlist_dataframe = pd.DataFrame()
+        cls.memberlist_dataframe_genuine_members = pd.DataFrame()
         cls.members_age_list = {}
         cls.new_members_previous_month = 0
         cls.new_members_previous_month_percentage = 0
@@ -44,6 +56,16 @@ class Memberlist:
         cls.new_members_current_month_percentage = 0
         cls.members_current_year = 0
         cls.members_per_year = {}
+        cls.women_current_year = 0
+        cls.women_last_year = 0
+        cls.women_per_year = {}
+        cls.men_current_year = 0
+        cls.men_last_year = 0
+        cls.men_per_year = {}
+        cls.resignations_per_year = {}
+        cls.resignations_total = 0
+        cls.resignations_per_year_female = {}
+        cls.resignations_per_year_male = {}
         return super().__new__(cls)
 
     def __init__(self, memberlist) -> None:
@@ -56,6 +78,8 @@ class Memberlist:
         self._set_new_members_previous_month()
         self.set_new_members_current_month()
         self.set_members_per_year()
+        self.set_members_per_gender_per_year()
+        self._count_possible_resignations()
 
     def _count_members(self):
         """
@@ -77,20 +101,56 @@ class Memberlist:
         Men are signified by 'Gender' = 'M' (danish - M for Mand)
         Women are signified by 'Gender' = 'K' (danish - K for Kvinde)
         """
-        df = self.memberlist_dataframe
+        df = self.memberlist_dataframe_genuine_members
         groups = df.groupby("Gender").size()
         men = 0
         women = 0
         if groups.get("M", "") != "":
-            men = groups["M"]
+            men = int(groups["M"])
         if groups.get("Mand", "") != "":
-            men += groups["Mand"]
+            men += int(groups["Mand"])
         if groups.get("K", "") != "":
-            women = groups["K"]
+            women = int(groups["K"])
         if groups.get("Kvinde", "") != "":
-            women += groups["Kvinde"]
+            women += int(groups["Kvinde"])
         self.count_men = men
         self.count_women = women
+
+    def _count_possible_resignations(self):
+        """
+        Method to count the number of members who have not renewed their membership
+        """
+        if "ResignationDate" in self.memberlist_dataframe.columns:
+            df = self.memberlist_dataframe_genuine_members
+            df["ResignationDate"] = pd.to_datetime(
+                df["ResignationDate"], errors="coerce"
+            )
+            possible_resignations = df.loc[
+                (df["ResignationDate"].notnull()) & (df["GenuineMember"] == 1)
+            ]
+            possible_resignations_per_year = possible_resignations.groupby(
+                possible_resignations["ResignationDate"].dt.strftime("%Y")
+            ).size()
+            self.resignations_per_year = possible_resignations_per_year.to_dict()
+            self.resignations_total = len(possible_resignations)
+            self.resignations_per_year_male = (
+                possible_resignations.loc[possible_resignations["Gender"] == "Mand"]
+                .groupby(possible_resignations["ResignationDate"].dt.strftime("%Y"))
+                .size()
+                .to_dict()
+            )
+            self.resignations_per_year_female = (
+                possible_resignations.loc[possible_resignations["Gender"] == "Kvinde"]
+                .groupby(possible_resignations["ResignationDate"].dt.strftime("%Y"))
+                .size()
+                .to_dict()
+            )
+            return len(possible_resignations)
+        else:
+            logger.warning(
+                "ResignationDate column does not exist in the memberlist dataframe."
+            )
+            return 0
 
     def _load_memberlist_to_dataframe(self):
         """
@@ -100,6 +160,9 @@ class Memberlist:
         if isinstance(the_memberlist, list):
             the_memberlist = json.dumps(self.memberlist)
         self.memberlist_dataframe = pd.read_json(the_memberlist)
+        self.memberlist_dataframe_genuine_members = self.memberlist_dataframe.loc[
+            self.memberlist_dataframe["GenuineMember"] == 1
+        ]
 
     def _create_member_ages_list(self) -> None:
         """
@@ -111,7 +174,9 @@ class Memberlist:
         for member in self.memberlist:
             if member["Birthday"] == "":
                 corrected_birthday = datetime.today().strftime("%Y-%m-%d")
-                logger.warning = f"Corrected birthday to be {corrected_birthday} for memberid: {member['MemberId']}, memberNumber: {member['MemberNumber']}, name: {member['FirstName']} {member['LastName']} "
+                logger.warning(
+                    f"Corrected birthday to be {corrected_birthday} for memberid: {member['MemberId']}, memberNumber: {member['MemberNumber']}, name: {member['FirstName']} {member['LastName']} "
+                )
                 member["Birthday"] = corrected_birthday
             birthday = datetime.strptime(member["Birthday"], "%Y-%m-%d")
             now = datetime.now()
@@ -223,6 +288,20 @@ class Memberlist:
         )
         return df_dates
 
+    def count_members_per_gender_per_year(self):
+        """
+        Method to count the number of members per year, split by gender
+        """
+        df = self.memberlist_dataframe_genuine_members
+        # convert EnrollmentDate to datetime
+        df["EnrollmentDate"] = pd.to_datetime(df["EnrollmentDate"])
+        df_gender_counts = (
+            df.groupby([df["EnrollmentDate"].dt.strftime("%Y"), "Gender"])
+            .size()
+            .unstack(fill_value=0)
+        )
+        return df_gender_counts
+
     def set_members_per_year(self):
         """
         Method to set class attributes for the number of members per year
@@ -242,3 +321,38 @@ class Memberlist:
         df = self.memberlist_dataframe
         addresses = df[["Address", "Zip"]]
         addresses.to_csv("addresses.csv", index=False)
+
+    def set_members_per_gender_per_year(self):
+        """
+        Method to set class attributes for the number of members per year
+        split by gender
+        """
+        self.members_per_gender_per_year = self.count_members_per_gender_per_year()
+        self.members_per_gender_per_year = self.members_per_gender_per_year.to_dict()
+        current_year = datetime.today().strftime("%Y")
+        last_year = (datetime.today() - relativedelta(years=1)).strftime("%Y")
+        if self.members_per_gender_per_year.get("Mand") is None:
+            self.men_current_year = 0
+            self.men_last_year = 0
+            self.men_per_year = {}
+        else:
+            self.men_current_year = self.members_per_gender_per_year.get(
+                "Mand", {current_year: 0}
+            ).get(current_year)
+            self.men_last_year = self.members_per_gender_per_year.get("Mand").get(
+                last_year
+            )
+            self.men_per_year = self.members_per_gender_per_year.get("Mand")
+
+        if self.members_per_gender_per_year.get("Kvinde") is None:
+            self.women_current_year = 0
+            self.women_last_year = 0
+            self.women_per_year = {}
+        else:
+            self.women_current_year = self.members_per_gender_per_year.get(
+                "Kvinde", {current_year: 0}
+            ).get(current_year)
+            self.women_last_year = self.members_per_gender_per_year.get("Kvinde").get(
+                last_year
+            )
+            self.women_per_year = self.members_per_gender_per_year.get("Kvinde")

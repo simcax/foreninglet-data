@@ -27,9 +27,9 @@ class Member(BaseModel):
     Phone: Optional[str] = ""  # '12345678 - this will accomodate country code
     Mobile: Optional[str] = ""
     EnrollmentDate: str  # - the date the member joined, as a string representation
-    DeliveryMethod: Optional[str] = (
-        ""  # - How invoicing will be handled for this member
-    )
+    DeliveryMethod: Optional[
+        str
+    ] = ""  # - How invoicing will be handled for this member
     PbsAgreementNumber: int = 0
     Note: Optional[str] = ""
     Password: str = ""
@@ -70,7 +70,7 @@ class Member(BaseModel):
     Membership: str = ""
 
     @property
-    def activity_ids(self):
+    def activity_ids(self):  # fmt: off
         """Return the activity ids for the member"""
         return self.activity_ids
 
