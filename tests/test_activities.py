@@ -1,7 +1,6 @@
 """Testing the activities module."""
 
 # The test file is named test_activities.py, and the module is named activities.py.
-import random
 
 import pytest
 import vcr
@@ -9,7 +8,6 @@ import vcr
 from foreninglet_data.activities import Activities
 from foreninglet_data.api import ForeningLet
 from foreninglet_data.models.activities_model import Activity
-from foreninglet_data.models.member_model import Member
 
 from .mock_member import MockMember
 
@@ -82,6 +80,19 @@ def test_map_menmberships():
     assert isinstance(memberships, dict)
 
 
+import logging
+
+logging.basicConfig()
+vcr_log = logging.getLogger("vcr")
+vcr_log.setLevel(logging.DEBUG)
+
+
+@vcr.use_cassette(
+    "tests/cassettes/test_data_fl_api_activities_anon.yaml",
+    filter_headers=["authorization"],
+    allow_playback_repeats=True,
+)
+@pytest.mark.vcr
 def test_map_membership_on_a_member():
     """Test mapping a membership to a member"""
     fl_obj = ForeningLet()

@@ -1,5 +1,7 @@
 # Testdata
 testdata_*
+*test_analyze_member_data.py
+vcr_cassettes/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

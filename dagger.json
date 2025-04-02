@@ -1,0 +1,6 @@
+{
+  "name": "foreninglet-data",
+  "sdk": "python",
+  "source": "foreninglet_data",
+  "engineVersion": "v0.13.3"
+}

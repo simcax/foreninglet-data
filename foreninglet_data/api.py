@@ -61,7 +61,10 @@ class ForeningLet:
         self.api_activities_url = (
             f"{self.api_base_url}{self.api_activities_path}?{self.api_version}"
         )
-        self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS")
+        if isinstance(environ.get("MEMBERSHIP_KEYWORDS"), str):
+            self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS").split(",")
+        else:
+            self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS")
 
     def fl_api_get(self, url):
         """
@@ -80,7 +83,15 @@ class ForeningLet:
 
     def get_memberlist(self):
         """Retrieves members from the member API endpoint"""
-        resp = self.fl_api_get(self.api_members_url)
+        try:
+            resp = self.fl_api_get(self.api_members_url)
+            if resp.status_code != 200:
+                return {"error": "API did not respond with 200"}
+        except requests.exceptions.ConnectionError:
+            return {"error": "Connection error"}
+        except requests.exceptions.Timeout:
+            return {"error": "Timeout"}
+
         return json.loads(resp.text)
 
     @use_cassette("tests/cassettes/test_data_fl_api_activities_anon.yaml")

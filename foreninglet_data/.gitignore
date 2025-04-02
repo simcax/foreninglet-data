@@ -1,0 +1,4 @@
+/sdk
+/.venv
+/**/__pycache__
+*analyze_member_data.py
