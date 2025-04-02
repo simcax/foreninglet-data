@@ -1,15 +1,20 @@
 """Test configuration for the ForeningLet Data module"""
 
 import json
-import sys
-from random import randint
-from unittest.mock import Mock
 
 import pytest
 from dotenv import load_dotenv
 
 from .mock_member import MockMember
-from .test_utils import TestUtils
+
+
+@pytest.fixture(autouse=True)
+def load_env():
+    """
+    Loads the environment variables from a .env file
+    It will load automatically, so the environment vars are ready
+    """
+    load_dotenv()
 
 
 @pytest.fixture(scope="module")

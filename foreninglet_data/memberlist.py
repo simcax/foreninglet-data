@@ -9,6 +9,8 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 from loguru import logger
 
+from foreninglet_data.models.member_model import Member as MemberModel
+
 
 class Memberlist:
     """
@@ -70,6 +72,7 @@ class Memberlist:
 
     def __init__(self, memberlist) -> None:
         self.memberlist = memberlist
+        self._self_convert_members_to_membermodels()
         self._load_memberlist_to_dataframe()
         self._count_members()
         self._count_genuine_members()
@@ -80,6 +83,15 @@ class Memberlist:
         self.set_members_per_year()
         self.set_members_per_gender_per_year()
         self._count_possible_resignations()
+
+    def _self_convert_members_to_membermodels(self):
+        """
+        Method to make sure each member in the memberlist is a MemberModel object
+        """
+        for index, member in enumerate(self.memberlist):
+            if not isinstance(member, MemberModel):
+                member = MemberModel(**member)
+                self.memberlist[index] = member
 
     def _count_members(self):
         """
@@ -356,3 +368,12 @@ class Memberlist:
                 last_year
             )
             self.women_per_year = self.members_per_gender_per_year.get("Kvinde")
+
+    def count_members_per_membership_types(self):
+        """
+        Method to count the number of members per membership type
+        """
+        df = self.memberlist_dataframe
+        # Count unique values in the MembershipType column and add to a dictionary
+        self.membership_types = df["MembershipType"].value_counts().to_dict()
+        return self.membership_types

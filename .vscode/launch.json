@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Anonymize Data",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "anonymize-data",
+                "tests/testdata_fl_api_get_anon.yaml"
+            ],
+            "justMyCode": false
+        }
+    ]
+}

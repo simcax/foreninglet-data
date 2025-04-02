@@ -11,6 +11,8 @@ from foreninglet_data.api import ForeningLet
 class Member(BaseModel):
     """Implements a Foreninglet Member"""
 
+    _activity_cache = None
+
     MemberId: int
     MemberNumber: int
     MemberCode: str  # 'd8a8d9241f0ec44' - The members password
@@ -18,7 +20,7 @@ class Member(BaseModel):
     LastName: str  # 'Doe', - Last name
     Address: str  # 'Femvej 7' - Address line 1
     Address2: Optional[str] = ""  # - Address line 2
-    Zip: int  # '4320'
+    Zip: str  # '4320'
     City: str  # 'Byen'
     CountryCode: str  # 'DK'
     Email: str  # 'me@me.com'
@@ -27,14 +29,14 @@ class Member(BaseModel):
     Phone: Optional[str] = ""  # '12345678 - this will accomodate country code
     Mobile: Optional[str] = ""
     EnrollmentDate: str  # - the date the member joined, as a string representation
-    DeliveryMethod: Optional[
-        str
-    ] = ""  # - How invoicing will be handled for this member
+    DeliveryMethod: Optional[str] = (
+        ""  # - How invoicing will be handled for this member
+    )
     PbsAgreementNumber: int = 0
     Note: Optional[str] = ""
     Password: str = ""
     Saldo: int = 0
-    SaldoPaymentDeadline: Optional[str] = ""
+    SaldoPaymentDeadline: Optional[int] = ""
     Created: str = ""
     Updated: str = ""
     Property: str = ""
@@ -66,7 +68,7 @@ class Member(BaseModel):
     ConsentField4: str = ""
     ConsentField5: str = ""
     Activities: str = ""
-    activity_ids: str = ""
+    activity_ids: list = []
     Membership: str = ""
 
     @property
@@ -85,13 +87,15 @@ class Member(BaseModel):
         and adds the membership to the member objects
         membership attribute
         """
-        foreninglet = ForeningLet()
-        activity_list = foreninglet.get_activities()
-        activities = Activities(activity_list)
-        membership_keywords = ["medlemskab", "medlemsskab"]
+        if cls._activity_cache is None:
+            foreninglet = ForeningLet()
+            cls._activity_cache = foreninglet.get_activities()
+
+        activities = Activities(cls._activity_cache)
+        membership_keywords = foreninglet.membership_keywords
         memberships = activities.identify_memberships(tuple(membership_keywords))
         activity_ids = values.activity_ids
-        for activity_id in activity_ids.split(","):
+        for activity_id in activity_ids:
             for membership in memberships:
                 if activity_id == membership:
                     values.Membership = memberships.get(membership)

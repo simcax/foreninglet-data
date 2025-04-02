@@ -20,6 +20,8 @@ class Activity:
     PriceNow: Optional[float] = "0.00"
     SettlementDate: Optional[str] = None
     CloseDate: Optional[str] = None
+    EndDate: Optional[str] = None
+    BackgroundColor: Optional[str] = None
 
 
 @dataclass

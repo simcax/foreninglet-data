@@ -61,7 +61,10 @@ class ForeningLet:
         self.api_activities_url = (
             f"{self.api_base_url}{self.api_activities_path}?{self.api_version}"
         )
-        self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS")
+        if isinstance(environ.get("MEMBERSHIP_KEYWORDS"), str):
+            self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS").split(",")
+        else:
+            self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS")
 
     def fl_api_get(self, url):
         """

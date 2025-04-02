@@ -7,7 +7,6 @@ from datetime import datetime
 
 import pandas as pd
 import pytest
-import vcr
 from dateutil.relativedelta import relativedelta
 
 from foreninglet_data.api import ForeningLet
@@ -63,8 +62,8 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     assert memberlist_obj.count_women == int(women)
 
 
-@vcr.use_cassette("tests/cassettes/test_data_fl_api_get_anon.yaml")
-@pytest.mark.vcr()
+# @vcr.use_cassette("tests/cassettes/test_data_fl_api_get_anon.yaml")
+# @pytest.mark.vcr()
 @pytest.mark.integration
 def test_memberlist_class_works_with_real_api_data():
     """
@@ -248,3 +247,15 @@ def test_members_per_year_per_gender(mocked_memberlist):
     assert df_gender_counts.loc[latest_year, "Kvinde"] == member_obj.women_current_year
     assert df_gender_counts.loc[last_year, "Mand"] == member_obj.men_last_year
     assert df_gender_counts.loc[last_year, "Kvinde"] == member_obj.women_last_year
+
+
+def test_count_membership_types():
+    """
+    Test to count the number of members with different membership types
+    """
+    fl_obj = ForeningLet()
+    memberlist = fl_obj.get_memberlist()
+    memberlist_obj = Memberlist(memberlist)
+    memberlist_obj.count_members_per_membership_types()
+
+    assert len(memberlist_obj.membership_types) > 0
