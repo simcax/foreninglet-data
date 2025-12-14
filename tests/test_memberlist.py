@@ -216,3 +216,18 @@ def test_members_per_year(mocked_memberlist):
         df_dates[(datetime.today() - relativedelta(years=1)).strftime("%Y")]
         == member_obj.members_last_year
     )
+
+
+def test_number_of_members_under_25(mocked_memberlist):
+    """
+    Test to count the number of members under 25 years old
+    """
+    memberlist = mocked_memberlist(10, 0)
+    current_year = datetime.now().year
+    for member in memberlist:
+        # Set member['Birthday'] to be 20 years ago
+        member["Birthday"] = f"{current_year - 20}-01-01"
+        # update the memberlist with the new Birthday
+        memberlist[memberlist.index(member)] = member
+    member_obj = Memberlist(memberlist)
+    assert member_obj.count_members_under_25 == 10
