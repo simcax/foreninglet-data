@@ -14,9 +14,47 @@ on:
 jobs:
   github-release:
     runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.commit_sha }}
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+      
+      - name: Set up Python
+        run: uv python install
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Build package
+        run: uv build
+      
+      - name: Archive release
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: dist/*
+      
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v6
+      
+      - name: Create tag
+        env:
+          PACKAGE_VERSION: ${{ github.event.inputs.packageVersion }}
+          COMMIT_SHA: ${{ github.event.inputs.commit_sha }}
+        run: |
+          git tag v${{ env.PACKAGE_VERSION }}
+          git push origin v${{ env.PACKAGE_VERSION }}
+      
       - id: create_release
         uses: actions/create-release@v1
         env:
@@ -24,8 +62,8 @@ jobs:
           PACKAGE_VERSION: ${{ github.event.inputs.packageVersion }}
           COMMIT_SHA: ${{ github.event.inputs.commit_sha }}
         with:
-          tag_name: v${{env.PACKAGE_VERSION}} ${{ github.ref }}
-          release_name: Release v${{ env.PACKAGE_VERSION }} ${{ github.ref }}
+          tag_name: v${{env.PACKAGE_VERSION}}
+          release_name: Release v${{ env.PACKAGE_VERSION }}
           body_path: releasenotes/${{ env.PACKAGE_VERSION }}.md
           draft: false
           prerelease: true
