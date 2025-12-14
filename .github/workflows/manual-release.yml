@@ -18,6 +18,8 @@ jobs:
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
+      # Allow creating releases and pushing tags
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
