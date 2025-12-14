@@ -39,7 +39,7 @@ jobs:
         run: uv build
       
       - name: Archive release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v6
         with:
           name: release
           path: dist/*
