@@ -1,7 +1,6 @@
 """Testing the activities module."""
 
 # The test file is named test_activities.py, and the module is named activities.py.
-import random
 
 import pytest
 import vcr
@@ -9,7 +8,6 @@ import vcr
 from foreninglet_data.activities import Activities
 from foreninglet_data.api import ForeningLet
 from foreninglet_data.models.activities_model import Activity
-from foreninglet_data.models.member_model import Member
 
 from .mock_member import MockMember
 
@@ -107,8 +105,8 @@ def test_create_activity_model():
     activity_model = Activity.from_dict(activity)
     assert isinstance(activity_model, Activity)
     assert activity_model.Name == "3 måneders medlemskab"
-    assert activity_model.ActivityId == 12345
-    assert activity_model.OnlineEnrollmentEnabled is True
+    assert activity_model.ActivityId == "12345"
+    assert activity_model.OnlineEnrollmentEnabled == "1"
     assert activity_model.SettlementDate == "0000-00-00T00:00:00+0000"
     assert activity_model.ExternalDescriptions == []
     assert activity_model.Categories == []
@@ -127,8 +125,8 @@ def test_create_activity_model_with_no_externaldescriptions():
     activity_model = Activity.from_dict(activity)
     assert isinstance(activity_model, Activity)
     assert activity_model.Name == "3 måneders medlemskab"
-    assert activity_model.ActivityId == 12345
-    assert activity_model.OnlineEnrollmentEnabled is True
+    assert activity_model.ActivityId == "12345"
+    assert activity_model.OnlineEnrollmentEnabled == "1"
     assert activity_model.SettlementDate == "0000-00-00T00:00:00+0000"
     assert activity_model.ExternalDescriptions == []
     assert activity_model.Categories == []
@@ -151,8 +149,8 @@ def test_create_activity_model_with_externaldescriptions():
     activity_model = Activity.from_dict(activity)
     assert isinstance(activity_model, Activity)
     assert activity_model.Name == "3 måneders medlemskab"
-    assert activity_model.ActivityId == 12345
-    assert activity_model.OnlineEnrollmentEnabled is True
+    assert activity_model.ActivityId == "12345"
+    assert activity_model.OnlineEnrollmentEnabled == "1"
     assert activity_model.SettlementDate == "0000-00-00T00:00:00+0000"
     assert activity_model.ExternalDescriptions == [
         {"Headline": "Headline1", "Text": "Text1"},

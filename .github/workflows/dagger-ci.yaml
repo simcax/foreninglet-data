@@ -1,21 +1,33 @@
-name: dagger
+name: dagger-ci
+
 on:
   push:
     branches: [main]
   pull_request:
 
 jobs:
-  build:
-    name: build
+  ci:
+    name: ci
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
         with:
-          python-version: '3.11'
-      - name: Install deps
-        run: pip install anyio dagger-io
-      - name: Install Dagger CLI
-        run: cd /usr/local && { curl -L https://dl.dagger.io/dagger/install.sh | sh; cd -; }
-      - name: Run Dagger pipeline
-        run: dagger run python dagger-ci.py
+          version: "latest"
+      
+      - name: Set up Python
+        run: uv python install
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Run Dagger CI Pipeline
+        uses: dagger/dagger-for-github@v8.2.0
+        with:
+          verb: run
+          args: uv run python dagger-ci.py
+          version: "0.19.8"
+          dagger-flags: "--progress plain"
