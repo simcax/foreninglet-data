@@ -45,7 +45,7 @@ jobs:
           path: dist/*
       
       - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v6
+        uses: pypa/gh-action-pypi-publish@release/v1
       
       - name: Create tag
         env:
