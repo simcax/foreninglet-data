@@ -21,12 +21,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black>=23.7.0",
-    "python-dotenv==1.0.1",
+    "python-dotenv==1.2.1",
     "dagger-io>=0.19.8",
-    "faker>=19.2,<25.0",
-    "typer>=0.9,<0.13",
+    "faker>=19.2,<39.0",
+    "typer>=0.9,<0.21",
     "sphinx>=7.2.6",
-    "pytest-cov>=4.1,<6.0",
+    "pytest-cov>=4.1,<8.0",
     "pytest>=8.0.0",
     "pytest-vcr>=1.0.2",
     "matplotlib>=3.10.8",
