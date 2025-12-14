@@ -8,9 +8,25 @@ from faker import Faker
 from foreninglet_data.activities import Activities
 from foreninglet_data.api import ForeningLet
 
+# Module-level cache for activities to avoid repeated API calls during testing
+_test_activities_cache = None
+_test_memberships_cache = None
+
+
+def clear_test_cache():
+    """Clear the cached activities and memberships - useful for testing"""
+    global _test_activities_cache, _test_memberships_cache
+    _test_activities_cache = None
+    _test_memberships_cache = None
+
 
 class TestUtils:
     """The test utility class"""
+
+    @classmethod
+    def clear_cache(cls):
+        """Clear the cached activities and memberships - useful for testing (backward compatibility)"""
+        clear_test_cache()
 
     @classmethod
     def create_random_string(cls):
@@ -32,12 +48,21 @@ class TestUtils:
         member_field_2 = "Ja"  # Yes, but to what?
         member_field_3 = "240"  # What does this number signify??
         # Build a list of activity ids to be used in the mock member
-        fl_obj = ForeningLet()
-        actvity_list = fl_obj.get_activities()
-        activity_obj = Activities(actvity_list)
-        membership_keywords = ["medlemskab", "medlemsskab"]
-        memberships = activity_obj.identify_memberships(tuple(membership_keywords))
-        activity_ids = random.choice(list(memberships.keys()))
+        # Use module-level cache to avoid repeated API calls
+        global _test_activities_cache, _test_memberships_cache
+
+        if _test_memberships_cache is None:
+            if _test_activities_cache is None:
+                fl_obj = ForeningLet()
+                _test_activities_cache = fl_obj.get_activities()
+
+            activity_obj = Activities(_test_activities_cache)
+            membership_keywords = ["medlemskab", "medlemsskab"]
+            _test_memberships_cache = activity_obj.identify_memberships(
+                tuple(membership_keywords)
+            )
+
+        activity_ids = random.choice(list(_test_memberships_cache.keys()))
         sex = {"M": "M", "F": "K"}
         fake = Faker("da_DK")
         member_data_dict = {

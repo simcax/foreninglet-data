@@ -11,15 +11,19 @@ from dataclasses_json import dataclass_json
 class Activity:
     """Implements a Foreninglet Activities model"""
 
-    ActivityId: int
+    ActivityId: str  # API returns strings for IDs
     Name: str
-    OnlineEnrollmentEnabled: bool
-    Categories: List[str]
-    DepartmentId: Optional[int] = None
-    ExternalDescriptions: Optional[List[dict[str, str]]] = field(default_factory=list)
-    PriceNow: Optional[float] = "0.00"
+    PriceNow: Optional[str] = "0.00"  # API returns strings for prices
+    OnlineEnrollmentEnabled: Optional[str] = "0"  # API returns "0" or "1" as strings
     SettlementDate: Optional[str] = None
     CloseDate: Optional[str] = None
+    ExternalDescriptions: List[dict[str, str]] = field(default_factory=list)
+    Categories: List[str] = field(default_factory=list)
+    DepartmentId: Optional[str] = None  # API returns strings for IDs
+    # Handle potential additional fields that might appear in test data
+    EndDate: Optional[str] = None
+    BackgroundColor: Optional[str] = None
+    Type: Optional[str] = None
 
 
 @dataclass

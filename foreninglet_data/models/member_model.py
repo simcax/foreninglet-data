@@ -1,11 +1,23 @@
 """A data class for a ForeningLet Member, to map a member from the API to an object"""
 
+import os
 from typing import Optional
 
 from pydantic import BaseModel, model_validator
 
 from foreninglet_data.activities import Activities
 from foreninglet_data.api import ForeningLet
+
+# Module-level cache to avoid repeated API calls across all Member instances
+_activities_cache = None
+_memberships_cache = None
+
+
+def clear_member_cache():
+    """Clear the cached activities and memberships - useful for testing"""
+    global _activities_cache, _memberships_cache
+    _activities_cache = None
+    _memberships_cache = None
 
 
 class Member(BaseModel):
@@ -69,31 +81,35 @@ class Member(BaseModel):
     activity_ids: str = ""
     Membership: str = ""
 
-    @property
-    def activity_ids(self):
-        """Return the activity ids for the member"""
-        return self.activity_ids
-
-    @activity_ids.setter
-    def activity_ids(self, value):
-        self.Membership = self.register_membership(value)
-
     @model_validator(mode="after")
-    def register_membership(cls, values):
+    def register_membership(self):
         """
         Maps the members activity ids to a membership,
         and adds the membership to the member objects
         membership attribute
         """
-        foreninglet = ForeningLet()
-        activity_list = foreninglet.get_activities()
-        activities = Activities(activity_list)
-        membership_keywords = ["medlemskab", "medlemsskab"]
-        memberships = activities.identify_memberships(tuple(membership_keywords))
-        activity_ids = values.activity_ids
+
+        global _activities_cache, _memberships_cache
+
+        # Use module-level cache to avoid repeated API calls
+        if _memberships_cache is None:
+            if _activities_cache is None:
+                foreninglet = ForeningLet()
+                _activities_cache = foreninglet.get_activities()
+
+            activities = Activities(_activities_cache)
+            membership_keywords_str = os.getenv(
+                "MEMBERSHIP_KEYWORDS", "medlemskab,medlemsskab"
+            )
+            membership_keywords = tuple(
+                keyword.strip() for keyword in membership_keywords_str.split(",")
+            )
+            _memberships_cache = activities.identify_memberships(membership_keywords)
+
+        activity_ids = self.activity_ids
         for activity_id in activity_ids.split(","):
-            for membership in memberships:
-                if activity_id == membership:
-                    values.Membership = memberships.get(membership)
-                    break
-        return values
+            activity_id = activity_id.strip()  # Remove any whitespace
+            if activity_id in _memberships_cache:
+                self.Membership = _memberships_cache[activity_id]
+                break  # Found a match, stop looking
+        return self

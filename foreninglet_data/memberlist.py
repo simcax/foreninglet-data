@@ -22,6 +22,7 @@ class Memberlist:
     member_count = 0
     count_men = 0
     count_women = 0
+    count_members_under_25 = 0
     memberlist_dataframe = pd.DataFrame()
     members_age_list = {}
     new_members_previous_month = 0
@@ -33,6 +34,7 @@ class Memberlist:
         """Make sure we create a clean memberlist object every time"""
         cls.count_men = 0
         cls.count_women = 0
+        cls.count_members_under_25 = 0
         cls.genuine_member_count = 0
         cls.member_count = 0
         cls.memberlist = ""
@@ -52,6 +54,7 @@ class Memberlist:
         self._count_members()
         self._count_genuine_members()
         self._count_genders()
+        self._count_members_under_25()
         self._create_member_ages_list()
         self._set_new_members_previous_month()
         self.set_new_members_current_month()
@@ -92,6 +95,27 @@ class Memberlist:
         self.count_men = men
         self.count_women = women
 
+    def _count_members_under_25(self):
+        """
+        Method to count the number of members who are 25 years old or younger
+        """
+        count = 0
+        for member in self.memberlist:
+            if member["Birthday"] == "":
+                # Skip members with no birthday - they won't be counted
+                continue
+            try:
+                birthday = datetime.strptime(member["Birthday"], "%Y-%m-%d")
+                now = datetime.now()
+                diff = relativedelta(now, birthday)
+                age = diff.years
+                if age <= 25:
+                    count += 1
+            except (ValueError, TypeError):
+                # Skip members with invalid birthday format
+                continue
+        self.count_members_under_25 = count
+
     def _load_memberlist_to_dataframe(self):
         """
         Method loading the memberlist to a dataframe
@@ -111,7 +135,9 @@ class Memberlist:
         for member in self.memberlist:
             if member["Birthday"] == "":
                 corrected_birthday = datetime.today().strftime("%Y-%m-%d")
-                logger.warning = f"Corrected birthday to be {corrected_birthday} for memberid: {member['MemberId']}, memberNumber: {member['MemberNumber']}, name: {member['FirstName']} {member['LastName']} "
+                logger.warning(
+                    f"Corrected birthday to be {corrected_birthday} for memberid: {member['MemberId']}, memberNumber: {member['MemberNumber']}, name: {member['FirstName']} {member['LastName']} "
+                )
                 member["Birthday"] = corrected_birthday
             birthday = datetime.strptime(member["Birthday"], "%Y-%m-%d")
             now = datetime.now()

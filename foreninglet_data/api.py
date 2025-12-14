@@ -5,8 +5,13 @@ from functools import lru_cache
 from os import environ
 
 import requests
+from dotenv import load_dotenv
+from retry.api import retry_call
 
 from foreninglet_data.activities import Activities
+
+# Load environment variables from .env file
+load_dotenv()
 
 if environ.get("TEST_ENVIRONMENT"):
     from vcr import use_cassette
@@ -61,16 +66,37 @@ class ForeningLet:
         self.api_activities_url = (
             f"{self.api_base_url}{self.api_activities_path}?{self.api_version}"
         )
-        self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS")
+        self.membership_keywords = environ.get("MEMBERSHIP_KEYWORDS").split(",")
 
     def fl_api_get(self, url):
         """
         Retrieves data from an api endpoint
         authenticates with the class api_username and api_password
         """
-        resp = requests.get(
-            url, auth=(self.api_username, self.api_password), timeout=60
-        )
+
+        def _make_request():
+            response = requests.get(
+                url, auth=(self.api_username, self.api_password), timeout=60
+            )
+            response.raise_for_status()
+            return response
+
+        try:
+            resp = retry_call(
+                _make_request,
+                exceptions=(
+                    requests.exceptions.Timeout,
+                    requests.exceptions.ConnectionError,
+                    requests.exceptions.HTTPError,
+                ),
+                tries=3,
+                delay=1,
+                backoff=2,
+                max_delay=10,
+            )
+        except Exception as e:
+            print(f"Error connecting to API: {e}")
+            raise
         return resp
 
     def check_api_responds(self):
