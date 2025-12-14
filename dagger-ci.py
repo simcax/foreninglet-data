@@ -15,28 +15,23 @@ async def test():
 
         python = (
             client.container()
-            .from_("python:3.11-slim")
-            # Install poetry
+            .from_("python:3.13-slim")
+            # Install uv
             .with_exec(
                 [
                     "python",
                     "-m",
                     "pip",
                     "install",
-                    "poetry",
-                    "black",
-                    "pylint",
-                    "pytest-cov",
+                    "uv",
                 ]
             )
-            # Set max workers for poetry
-            .with_exec(["poetry", "config", "installer.max-workers", "10"])
             # mount cloned repository into image
             .with_directory("/src", src)
             # set current working directory for next commands
             .with_workdir("/src")
-            # install test dependencies
-            .with_exec(["poetry", "install", "--with", "dev"])
+            # install dependencies with uv
+            .with_exec(["uv", "sync"])
             .with_env_variable("API_USERNAME", "DUMMY")
             .with_env_variable("API_PASSWORD", "DUMMY")
             .with_env_variable("API_BASE_URL", "https://foreninglet.dk/api/")
@@ -47,19 +42,29 @@ async def test():
             .with_env_variable("MEMBERSHIP_KEYWORDS", "medlemskab,medlemsskab")
             .with_env_variable("TEST_ENVIRONMENT", "True")
             # Check standards
-            .with_exec(["black", "--check", "--diff", "--color", "."])
+            .with_exec(
+                [
+                    "uv",
+                    "run",
+                    "black",
+                    "--check",
+                    "--diff",
+                    "--color",
+                    "--exclude",
+                    "(.venv|foreninglet_data/sdk/)",
+                    ".",
+                ]
+            )
             # run tests
             .with_exec(
                 [
-                    "poetry",
+                    "uv",
                     "run",
-                    "python",
-                    "-m",
                     "pytest",
                     "--vcr-record=none",
-                    ".",
+                    "tests/",
                     "--junitxml=junit/test-results.xml",
-                    "--cov=com",
+                    "--cov=foreninglet_data",
                     "--cov-report=xml",
                     "--cov-report=html",
                 ]

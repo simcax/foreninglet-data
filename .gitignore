@@ -1,5 +1,9 @@
 # Testdata
 testdata_*
+vcr_cassettes/
+
+# CI
+foreninglet_data/sdk/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
