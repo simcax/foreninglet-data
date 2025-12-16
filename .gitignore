@@ -2,6 +2,9 @@
 testdata_*
 vcr_cassettes/
 
+# Local tests
+*no_commit_*
+
 # CI
 foreninglet_data/sdk/
 

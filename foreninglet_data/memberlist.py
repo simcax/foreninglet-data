@@ -9,6 +9,8 @@ import pandas as pd
 from dateutil.relativedelta import relativedelta
 from loguru import logger
 
+from foreninglet_data.models.member_model import Member
+
 
 class Memberlist:
     """
@@ -268,3 +270,220 @@ class Memberlist:
         df = self.memberlist_dataframe
         addresses = df[["Address", "Zip"]]
         addresses.to_csv("addresses.csv", index=False)
+
+    def count_members_in_municipality_over_under_25(
+        self,
+        zip_code: str,
+        member_in_year: int = None,
+        include_membership_breakdown: bool = False,
+    ) -> dict:
+        """
+        Count members over and under 25, living in and outside of the specified zip code.
+        Optionally include breakdown by membership type and months of membership.
+
+        Args:
+            zip_code (str): The zip code to check against
+            member_in_year (int, optional): Year to filter members by enrollment date.
+                                          Only count members who were already enrolled in this year.
+            include_membership_breakdown (bool): Include breakdown by membership type and months
+
+        Returns:
+            dict: Dictionary with counts for each category:
+                - inside_zip_under_25: Members under 25 in the specified zip code
+                - inside_zip_over_25: Members 25 and over in the specified zip code
+                - outside_zip_under_25: Members under 25 outside the specified zip code
+                - outside_zip_over_25: Members 25 and over outside the specified zip code
+
+                If include_membership_breakdown=True, also includes:
+                - membership_breakdown: Dict with membership type breakdowns
+                - total_membership_months: Total months of membership for the year
+        """
+        counts = {
+            "inside_zip_under_25": 0,
+            "inside_zip_over_25": 0,
+            "outside_zip_under_25": 0,
+            "outside_zip_over_25": 0,
+        }
+
+        if include_membership_breakdown:
+            membership_breakdown = {}
+            total_membership_months = 0
+            year_start = (
+                datetime(member_in_year, 1, 1)
+                if member_in_year
+                else datetime(datetime.now().year, 1, 1)
+            )
+            year_end = (
+                datetime(member_in_year, 12, 31)
+                if member_in_year
+                else datetime(datetime.now().year, 12, 31)
+            )
+
+        for member_data in self.memberlist:
+            try:
+                # Skip members without birthday or zip code
+                if not member_data.get("Birthday") or not member_data.get("Zip"):
+                    continue
+
+                # Skip members without enrollment date if year filter is specified
+                if member_in_year is not None and not member_data.get("EnrollmentDate"):
+                    continue
+
+                # Filter by enrollment year if specified
+                if member_in_year is not None:
+                    enrollment_date = datetime.strptime(
+                        member_data["EnrollmentDate"], "%Y-%m-%d"
+                    )
+                    enrollment_year = enrollment_date.year
+                    # Skip members who enrolled after the specified year
+                    if enrollment_year > member_in_year:
+                        continue
+
+                # Calculate age
+                birthday = datetime.strptime(member_data["Birthday"], "%Y-%m-%d")
+                now = datetime.now()
+                diff = relativedelta(now, birthday)
+                age = diff.years
+
+                # Get member zip code as string for comparison
+                member_zip = str(member_data["Zip"])
+
+                # Determine if member is under or over 25
+                is_under_25 = age < 25
+                # Determine if member lives in the specified zip code
+                is_inside_zip = member_zip == zip_code
+
+                # Increment appropriate counter
+                if is_inside_zip:
+                    if is_under_25:
+                        counts["inside_zip_under_25"] += 1
+                    else:
+                        counts["inside_zip_over_25"] += 1
+                else:
+                    if is_under_25:
+                        counts["outside_zip_under_25"] += 1
+                    else:
+                        counts["outside_zip_over_25"] += 1
+
+                # Handle membership breakdown if requested
+                if include_membership_breakdown:
+                    # Get membership type using helper method
+                    membership_type = self._get_membership_for_member(member_data)
+
+                    # Initialize membership breakdown structure if not exists
+                    if membership_type not in membership_breakdown:
+                        membership_breakdown[membership_type] = {
+                            "inside_zip_under_25": 0,
+                            "inside_zip_over_25": 0,
+                            "outside_zip_under_25": 0,
+                            "outside_zip_over_25": 0,
+                            "total_months": 0,
+                        }
+
+                    # Count by membership type and location/age
+                    if is_inside_zip:
+                        if is_under_25:
+                            membership_breakdown[membership_type][
+                                "inside_zip_under_25"
+                            ] += 1
+                        else:
+                            membership_breakdown[membership_type][
+                                "inside_zip_over_25"
+                            ] += 1
+                    else:
+                        if is_under_25:
+                            membership_breakdown[membership_type][
+                                "outside_zip_under_25"
+                            ] += 1
+                        else:
+                            membership_breakdown[membership_type][
+                                "outside_zip_over_25"
+                            ] += 1
+
+                    # Calculate months of membership in the specified year
+                    enrollment_start = max(enrollment_date, year_start)
+                    membership_end = min(datetime.now(), year_end)
+
+                    if enrollment_start <= membership_end:
+                        months_diff = relativedelta(membership_end, enrollment_start)
+                        months_in_year = (
+                            months_diff.months
+                            + (months_diff.years * 12)
+                            + (1 if months_diff.days > 0 else 0)
+                        )
+                        membership_breakdown[membership_type]["total_months"] += (
+                            months_in_year
+                        )
+                        total_membership_months += months_in_year
+
+            except (ValueError, TypeError):
+                # Skip members with invalid date formats
+                continue
+
+        if include_membership_breakdown:
+            counts["membership_breakdown"] = membership_breakdown
+            counts["total_membership_months"] = total_membership_months
+
+        return counts
+
+    def _get_membership_for_member(self, member_data: dict) -> str:
+        """
+        Helper method to get membership type for a member using the Member model validation.
+        
+        Args:
+            member_data (dict): Member data dictionary
+            
+        Returns:
+            str: Membership type name or "Unknown" if unable to determine
+        """
+        try:
+
+            
+            # Create a minimal Member instance just to get the membership
+            # Fill in required fields with defaults if missing
+            member_dict = member_data.copy()
+            
+            # Ensure required fields have values and fix data type issues
+            required_defaults = {
+                "MemberId": member_dict.get("MemberId", 0),
+                "MemberNumber": member_dict.get("MemberNumber", 0),
+                "MemberCode": member_dict.get("MemberCode", ""),
+                "FirstName": member_dict.get("FirstName", ""),
+                "LastName": member_dict.get("LastName", ""),
+                "Address": member_dict.get("Address", ""),
+                "Zip": member_dict.get("Zip", 0),
+                "City": member_dict.get("City", ""),
+                "CountryCode": member_dict.get("CountryCode", "DK"),
+                "Email": member_dict.get("Email", ""),
+                "Birthday": member_dict.get("Birthday", ""),
+                "Gender": member_dict.get("Gender", ""),
+                "EnrollmentDate": member_dict.get("EnrollmentDate", ""),
+            }
+            
+            # Update member_dict with defaults for missing required fields
+            for key, default_value in required_defaults.items():
+                if key not in member_dict or member_dict[key] is None:
+                    member_dict[key] = default_value
+            
+            # Fix data type issues identified in validation errors
+            
+            # Fix SaldoPaymentDeadline - convert int to string
+            if "SaldoPaymentDeadline" in member_dict and isinstance(member_dict["SaldoPaymentDeadline"], int):
+                member_dict["SaldoPaymentDeadline"] = str(member_dict["SaldoPaymentDeadline"])
+            elif "SaldoPaymentDeadline" not in member_dict:
+                member_dict["SaldoPaymentDeadline"] = ""
+            
+            # Fix activity_ids - convert list to comma-separated string
+            if "activity_ids" in member_dict:
+                if isinstance(member_dict["activity_ids"], list):
+                    member_dict["activity_ids"] = ",".join(str(id) for id in member_dict["activity_ids"])
+                elif member_dict["activity_ids"] is None:
+                    member_dict["activity_ids"] = ""
+            else:
+                member_dict["activity_ids"] = ""
+            
+            member = Member(**member_dict)
+            return member.Membership if member.Membership else "Unknown"
+            
+        except Exception:
+            return "Unknown"

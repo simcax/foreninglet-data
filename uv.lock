@@ -568,6 +568,7 @@ dev = [
 dev = [
     { name = "black" },
     { name = "faker" },
+    { name = "matplotlib" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-vcr" },
@@ -601,6 +602,7 @@ provides-extras = ["dev"]
 dev = [
     { name = "black", specifier = ">=25.12.0" },
     { name = "faker", specifier = ">=24.14.1" },
+    { name = "matplotlib", specifier = ">=3.10.8" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-cov", specifier = ">=5.0.0" },
     { name = "pytest-vcr", specifier = ">=1.0.2" },
