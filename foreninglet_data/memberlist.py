@@ -411,9 +411,9 @@ class Memberlist:
                             + (months_diff.years * 12)
                             + (1 if months_diff.days > 0 else 0)
                         )
-                        membership_breakdown[membership_type]["total_months"] += (
-                            months_in_year
-                        )
+                        membership_breakdown[membership_type][
+                            "total_months"
+                        ] += months_in_year
                         total_membership_months += months_in_year
 
             except (ValueError, TypeError):
@@ -429,20 +429,19 @@ class Memberlist:
     def _get_membership_for_member(self, member_data: dict) -> str:
         """
         Helper method to get membership type for a member using the Member model validation.
-        
+
         Args:
             member_data (dict): Member data dictionary
-            
+
         Returns:
             str: Membership type name or "Unknown" if unable to determine
         """
         try:
 
-            
             # Create a minimal Member instance just to get the membership
             # Fill in required fields with defaults if missing
             member_dict = member_data.copy()
-            
+
             # Ensure required fields have values and fix data type issues
             required_defaults = {
                 "MemberId": member_dict.get("MemberId", 0),
@@ -459,31 +458,37 @@ class Memberlist:
                 "Gender": member_dict.get("Gender", ""),
                 "EnrollmentDate": member_dict.get("EnrollmentDate", ""),
             }
-            
+
             # Update member_dict with defaults for missing required fields
             for key, default_value in required_defaults.items():
                 if key not in member_dict or member_dict[key] is None:
                     member_dict[key] = default_value
-            
+
             # Fix data type issues identified in validation errors
-            
+
             # Fix SaldoPaymentDeadline - convert int to string
-            if "SaldoPaymentDeadline" in member_dict and isinstance(member_dict["SaldoPaymentDeadline"], int):
-                member_dict["SaldoPaymentDeadline"] = str(member_dict["SaldoPaymentDeadline"])
+            if "SaldoPaymentDeadline" in member_dict and isinstance(
+                member_dict["SaldoPaymentDeadline"], int
+            ):
+                member_dict["SaldoPaymentDeadline"] = str(
+                    member_dict["SaldoPaymentDeadline"]
+                )
             elif "SaldoPaymentDeadline" not in member_dict:
                 member_dict["SaldoPaymentDeadline"] = ""
-            
+
             # Fix activity_ids - convert list to comma-separated string
             if "activity_ids" in member_dict:
                 if isinstance(member_dict["activity_ids"], list):
-                    member_dict["activity_ids"] = ",".join(str(id) for id in member_dict["activity_ids"])
+                    member_dict["activity_ids"] = ",".join(
+                        str(id) for id in member_dict["activity_ids"]
+                    )
                 elif member_dict["activity_ids"] is None:
                     member_dict["activity_ids"] = ""
             else:
                 member_dict["activity_ids"] = ""
-            
+
             member = Member(**member_dict)
             return member.Membership if member.Membership else "Unknown"
-            
+
         except Exception:
             return "Unknown"
