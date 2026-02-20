@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from loguru import logger
 
 from foreninglet_data.models.member_model import Member
+from io import StringIO
 
 
 class Memberlist:
@@ -125,7 +126,7 @@ class Memberlist:
         the_memberlist = self.memberlist
         if isinstance(the_memberlist, list):
             the_memberlist = json.dumps(self.memberlist)
-        self.memberlist_dataframe = pd.read_json(the_memberlist)
+        self.memberlist_dataframe = pd.read_json(StringIO(the_memberlist))
 
     def _create_member_ages_list(self) -> None:
         """
@@ -437,7 +438,6 @@ class Memberlist:
             str: Membership type name or "Unknown" if unable to determine
         """
         try:
-
             # Create a minimal Member instance just to get the membership
             # Fill in required fields with defaults if missing
             member_dict = member_data.copy()
