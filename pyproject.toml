@@ -1,6 +1,6 @@
 [project]
 name = "foreninglet-data"
-version = "0.5.0"
+version = "0.5.1"
 description = "A way to retrieve information about members from the ForeningLet API (www.foreninglet.dk) - ForeningLet is a member system for small (typically) voluntary organizations in Denmark"
 authors = [
     {name = "Carsten Skov", email = "carsten@simcax.dk"}
