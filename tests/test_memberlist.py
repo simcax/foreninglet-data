@@ -12,7 +12,7 @@ from dateutil.relativedelta import relativedelta
 
 from foreninglet_data.api import ForeningLet
 from foreninglet_data.memberlist import Memberlist
-
+from io import StringIO
 
 def test_memberlist_isobject(mocked_memberlist):
     """
@@ -46,7 +46,7 @@ def test_memberlist_has_correct_gender_count(mocked_memberlist):
     as attributes
     """
     memberlist = mocked_memberlist(12, 0)
-    df = pd.read_json(json.dumps(memberlist))
+    df = pd.read_json(StringIO(json.dumps(memberlist)))
     groups = df.groupby("Gender").size()
     males = 0
     females = 0
