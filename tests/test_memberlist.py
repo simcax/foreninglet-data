@@ -14,6 +14,7 @@ from foreninglet_data.api import ForeningLet
 from foreninglet_data.memberlist import Memberlist
 from io import StringIO
 
+
 def test_memberlist_isobject(mocked_memberlist):
     """
     A test to see a memberlist object has the correct membercount attribute
