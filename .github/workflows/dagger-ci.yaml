@@ -29,5 +29,5 @@ jobs:
         with:
           verb: run
           args: uv run python dagger-ci.py
-          version: "0.19.8"
+          version: "0.19.11"
           dagger-flags: "--progress plain"
