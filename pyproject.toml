@@ -25,7 +25,7 @@ dev = [
     "python-dotenv==1.2.1",
     "dagger-io>=0.19.8",
     "faker>=19.2,<41.0",
-    "typer>=0.9,<0.22",
+    "typer>=0.9,<0.25",
     "sphinx>=7.2.6",
     "pytest-cov>=4.1,<8.0",
     "pytest>=8.0.0",
