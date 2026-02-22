@@ -1,0 +1,45 @@
+name: Release on Tag
+on: 
+  push:
+    tags:
+      - "v*"
+jobs:
+  github-release:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
+      # Allow creating releases and pushing tags
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+          github-token: ${{ github.token }}
+      
+      - name: Set up Python
+        run: uv python install
+      
+      - name: Install dependencies
+        run: uv sync
+      
+      - name: Build package
+        run: uv build
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v2 
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body_path: releasenotes/${{ github.ref_name }}.md
+          name: Release ${{ github.ref_name }}
+          files: |
+            dist/*
+
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+      
